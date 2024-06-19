@@ -1,5 +1,9 @@
 package com.gather.user.dto;
 
+
+
+import com.gather.user.entity.Role;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -10,5 +14,5 @@ public class UserRegisterDTO {
   private String username;
   private String password;
   private String email;
-  private String role;
+  private Role role;
 }

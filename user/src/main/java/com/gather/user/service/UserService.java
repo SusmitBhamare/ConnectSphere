@@ -1,11 +1,7 @@
 package com.gather.user.service;
 
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
-import com.gather.user.dto.UserRegisterDTO;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 public interface UserService {
-  boolean createUser(UserRegisterDTO data);
-  UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
+  UserDetailsService userDetailsService();
 }
