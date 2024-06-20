@@ -34,7 +34,8 @@ public class User implements UserDetails {
   private String email;
   private String image;
   private Role role;
-  private Collection<UUID> messages;
+  private Collection<UUID> messagesSent;
+  private Collection<UUID> messagesReceived;
   private Collection<UUID> workspaces;
 
   @Override
