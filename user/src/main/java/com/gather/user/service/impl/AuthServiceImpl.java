@@ -1,7 +1,9 @@
 package com.gather.user.service.impl;
 
+import org.springframework.http.HttpHeaders;
 import java.util.HashMap;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +17,8 @@ import com.gather.user.entity.User;
 import com.gather.user.repository.UserRepository;
 import com.gather.user.service.AuthService;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -38,17 +42,26 @@ public class AuthServiceImpl implements AuthService{
   }
 
   @Override
-  public UserLoginResponseDTO login(UserLoginDTO userLoginDTO){
+  public ResponseEntity<UserLoginResponseDTO> login(UserLoginDTO userLoginDTO , HttpServletResponse response){
     authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLoginDTO.getUsername(), userLoginDTO.getPassword()));
 
     User user = userRepository.findByUsername(userLoginDTO.getUsername()).orElseThrow(() -> new IllegalArgumentException("Invalid Credentials"));
     String token = jwtService.generateToken(user);
     String refreshToken = jwtService.generateRefreshToken(new HashMap<>() , user);
-    
-    UserLoginResponseDTO response = new UserLoginResponseDTO();
-    response.setToken(token);
-    response.setRefreshToken(refreshToken);
-    return response;
+
+    Cookie tokenCookie = new Cookie("token" , token);
+    tokenCookie.setHttpOnly(true);
+    tokenCookie.setPath("/");
+    tokenCookie.setMaxAge(60 * 60 * 24 * 7);
+    response.addCookie(tokenCookie);
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setBearerAuth(refreshToken);
+
+    UserLoginResponseDTO responseBody = new UserLoginResponseDTO();
+    responseBody.setToken(token);
+    responseBody.setRefreshToken(refreshToken);
+    return ResponseEntity.ok().headers(headers).body(responseBody);
   }
   
 }

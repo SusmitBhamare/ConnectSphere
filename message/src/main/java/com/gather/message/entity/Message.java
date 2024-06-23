@@ -1,6 +1,7 @@
 package com.gather.message.entity;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.UUID;
 
 import jakarta.persistence.Entity;
@@ -26,4 +27,6 @@ public class Message {
   private UUID senderId;
   private UUID workspaceId;
   private String attachment;
+  private Date sentAt;
+  private Date createdAt;
 }

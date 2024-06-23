@@ -12,6 +12,8 @@ import com.gather.user.dto.UserRegisterDTO;
 import com.gather.user.entity.User;
 import com.gather.user.service.AuthService;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -27,7 +29,8 @@ public class AuthController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<UserLoginResponseDTO> login(@RequestBody UserLoginDTO userLoginDTO){
-    return ResponseEntity.ok().body(authService.login(userLoginDTO));
+  public ResponseEntity<UserLoginResponseDTO> login(@RequestBody UserLoginDTO userLoginDTO , 
+      HttpServletResponse response){
+    return authService.login(userLoginDTO , response);
   }
 }

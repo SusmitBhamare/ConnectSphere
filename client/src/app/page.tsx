@@ -16,20 +16,22 @@ useEffect(() => {
 
   const handleSendMessage = () => {
     if(message && sendId){
-      const messageObject:message = {
+      const messageObject: message = {
         content: message,
         senderId: sendId,
-        id: null,
-        receiverIds: null,
-        status: null,
+        receiverIds: [
+          "d0e0fb26-c7f3-486b-a075-edbefaaf9813",
+          "d0e0fb26-c7f3-486b-a075-edbefaaf9814",
+        ],
         workspaceId: null,
-        attachment: null
-      }
+        attachment: null,
+        createdAt: new Date(),
+      };
       console.log(messageObject);
       sendMessage(messageObject);
       setMessage("");
-    setMessages((prevMessages) => [...prevMessages, messageObject]);
-      console.log(messages);
+    // setMessages((prevMessages) => [...prevMessages, messageObject]);
+    //   console.log(messages);
     }
     
   }
