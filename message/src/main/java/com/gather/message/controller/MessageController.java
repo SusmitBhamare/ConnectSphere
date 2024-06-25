@@ -2,6 +2,7 @@ package com.gather.message.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,12 +25,12 @@ public class MessageController {
   @SendTo("/topic/messages")
   public ResponseEntity<String> sendMessage(@RequestBody MessageDTO message){
     System.out.println("Message Received" + message);
+    if(message.getWorkspaceId() != null){
+      messageService.sendMessageToWorkspace(message);
+      return new ResponseEntity<>("Message Sent to Workspace" , HttpStatus.OK);
+    }
     messageService.sendMessage(message);
     return new ResponseEntity<>("Message Sent" , HttpStatus.OK);
   }
 
-  @GetMapping("/test")
-  public String test(){
-    return "Test";
-  }
 }
