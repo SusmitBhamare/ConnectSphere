@@ -29,11 +29,13 @@ public class User implements UserDetails {
   private String email;
   private String image;
   private Role role;
-  @ElementCollection
+  @ElementCollection(targetClass = UUID.class)
   private Collection<UUID> messagesSent;
-  @ElementCollection
+
+  @ElementCollection(targetClass = UUID.class)
   private Collection<UUID> messagesReceived;
-  @ElementCollection
+
+  @ElementCollection(targetClass = UUID.class)
   private Collection<UUID> workspaces;
 
   @Override

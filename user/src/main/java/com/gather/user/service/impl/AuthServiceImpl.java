@@ -49,19 +49,11 @@ public class AuthServiceImpl implements AuthService{
     String token = jwtService.generateToken(user);
     String refreshToken = jwtService.generateRefreshToken(new HashMap<>() , user);
 
-    Cookie tokenCookie = new Cookie("token" , token);
-    tokenCookie.setHttpOnly(true);
-    tokenCookie.setPath("/");
-    tokenCookie.setMaxAge(60 * 60 * 24 * 7);
-    response.addCookie(tokenCookie);
-
-    HttpHeaders headers = new HttpHeaders();
-    headers.setBearerAuth(refreshToken);
 
     UserLoginResponseDTO responseBody = new UserLoginResponseDTO();
     responseBody.setToken(token);
     responseBody.setRefreshToken(refreshToken);
-    return ResponseEntity.ok().headers(headers).body(responseBody);
+    return ResponseEntity.ok().body(responseBody);
   }
   
 }

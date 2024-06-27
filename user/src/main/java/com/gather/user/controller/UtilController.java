@@ -24,8 +24,8 @@ public class UtilController {
     @GetMapping("/user/{username}")
     public ResponseEntity<User> getUser(@PathVariable String username) {
         User user = utilService.getUser(username);
-        if(user == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         return ResponseEntity.ok(user);
     }

@@ -1,10 +1,5 @@
 package com.gather.message.dummy;
 
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
 import java.util.Collection;
 import java.util.UUID;
 
