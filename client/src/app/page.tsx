@@ -1,24 +1,19 @@
-import { Button } from '@/components/ui/button'
+import Home from '@/components/custom/Home';
 import axios from 'axios';
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 import React from 'react'
+import { getToken, isLoggedIn } from './utils/isLoggedIn';
+import Navbar from '@/components/custom/Navbar';
 
 function page() {
   axios.defaults.withCredentials = true;
-  const cookieStore = cookies();
-  const token = cookieStore.get('token');
-  console.log(token);
-
+  let token:string | undefined = "";
+  if(isLoggedIn()){
+    token = getToken()?.value;  
+  }
   return (
-    <div className='m-4 flex gap-4'>
-      <h1 className="text-2xl">{token === undefined ? "No Cookie" : token.value}</h1>
-      <Button asChild>
-      <Link className='' href={"/login"}>Login</Link>
-      </Button>
-      <Button asChild>
-      <Link href={"/register"}>Register</Link>
-      </Button>
+    <div>
     </div>
   )
 }

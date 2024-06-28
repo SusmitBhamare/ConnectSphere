@@ -2,7 +2,8 @@ import { SignupSchema } from "@/lib/schemas/signupSchema";
 import axios from "axios"
 import { toast } from "sonner";
 
-const url = 'http://localhost:8081'
+// Port forwarding Check next.config.js. Done to tackle with cookies not being set in the browser
+const url = 'http://localhost:3000/api/user';
 export async function doesUserExist(username : string){
   try{
     const response = await axios.get(url + '/util/user/' + username);

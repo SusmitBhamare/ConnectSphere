@@ -1,7 +1,6 @@
 package com.gather.user.service.impl;
 
-import org.springframework.http.HttpHeaders;
-import java.util.HashMap;
+import com.gather.user.entity.Role;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,6 +28,7 @@ public class AuthServiceImpl implements AuthService{
   private final PasswordEncoder passwordEncoder;
   private final AuthenticationManager authenticationManager;
   private final JWTService jwtService;
+  private final RedisService redisService;
 
   @Override
   public User register(UserRegisterDTO userRegisterDTO){
@@ -36,7 +36,7 @@ public class AuthServiceImpl implements AuthService{
     user.setUsername(userRegisterDTO.getUsername());
     user.setPassword(passwordEncoder.encode(userRegisterDTO.getPassword()));
     user.setEmail(userRegisterDTO.getEmail());
-    user.setRole(userRegisterDTO.getRole());
+    user.setRole(Role.USER);
     user.setName(userRegisterDTO.getName());
     return userRepository.save(user);
   }
@@ -47,13 +47,22 @@ public class AuthServiceImpl implements AuthService{
 
     User user = userRepository.findByUsername(userLoginDTO.getUsername()).orElseThrow(() -> new IllegalArgumentException("Invalid Credentials"));
     String token = jwtService.generateToken(user);
-    String refreshToken = jwtService.generateRefreshToken(new HashMap<>() , user);
 
+    Cookie tokenCookie = new Cookie("token" , token);
+    tokenCookie.setHttpOnly(true);
+    tokenCookie.setPath("/");
+    tokenCookie.setMaxAge(10*60*60);
+    response.addCookie(tokenCookie);
 
     UserLoginResponseDTO responseBody = new UserLoginResponseDTO();
     responseBody.setToken(token);
-    responseBody.setRefreshToken(refreshToken);
-    return ResponseEntity.ok().body(responseBody);
+    return ResponseEntity.ok().header("Access-Control-Allow-Credentials", "true").body(responseBody);
   }
-  
+
+  @Override
+  public void logout(User user, HttpServletResponse response){
+    response.setHeader("Set-Cookie", "token=; path=/; max-age=0; HttpOnly; SameSite=None; Secure");
+    redisService.deleteToken("token_" + user.getUsername());
+  }
+
 }

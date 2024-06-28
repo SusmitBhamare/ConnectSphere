@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: postgres
     volumes:
       - postgres:/data/postgres
-    ports :
+    ports:
       - 5432:5432
     networks:
       - employee-network
@@ -27,11 +27,18 @@ services:
     volumes:
       - ./pgadmin:/var/lib/pgadmin
 
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - 6379:6379
+    networks:
+      - employee-network
+
 networks:
   employee-network:
     driver: bridge
- 
+
 volumes:
   postgres:
   pgadmin:
-

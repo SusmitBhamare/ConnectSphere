@@ -12,5 +12,6 @@ import jakarta.servlet.http.HttpServletResponse;
 public interface AuthService {
 User register(UserRegisterDTO userRegisterDTO);
  ResponseEntity<UserLoginResponseDTO> login(UserLoginDTO userLoginDTO , HttpServletResponse response);
-  
+ void logout(User user, HttpServletResponse response);
+
 }
