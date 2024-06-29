@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 import { FaBarsStaggered } from "react-icons/fa6";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
 import Home from './Home';
-import { getToken } from '@/app/utils/isLoggedIn';
+import { getToken } from '@/app/utils/jwtUtil';
 
 function ResponsiveNavbar() {
   return (

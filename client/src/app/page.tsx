@@ -3,7 +3,7 @@ import axios from 'axios';
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 import React from 'react'
-import { getToken, isLoggedIn } from './utils/isLoggedIn';
+import { getToken, isLoggedIn } from './utils/jwtUtil';
 import Navbar from '@/components/custom/Navbar';
 
 function page() {

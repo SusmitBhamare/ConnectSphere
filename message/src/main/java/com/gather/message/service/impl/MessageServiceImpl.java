@@ -1,11 +1,13 @@
 package com.gather.message.service.impl;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import com.gather.message.client.UserClient;
 import com.gather.message.dummy.User;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,7 @@ public class MessageServiceImpl implements MessageService {
   private final SimpMessagingTemplate simpMessagingTemplate;
   private final MessageRepository messageRepository;
   private final UserClient userClient;
+  private final RedisTemplate<String,Object> redisTemplate;
   
   @Override
   public void sendMessage(MessageDTO messageDTO) {
@@ -31,6 +34,7 @@ public class MessageServiceImpl implements MessageService {
 
     for(UUID receiverId : messageDTO.getReceiverIds()){
       simpMessagingTemplate.convertAndSendToUser(receiverId.toString() , "/topic/messages", messageDTO);
+      redisTemplate.opsForList().rightPush("user:" + receiverId + ":messages", message);
     }
     message.setSentAt(new Date());
     messageRepository.save(message);
@@ -52,6 +56,7 @@ public class MessageServiceImpl implements MessageService {
   public void sendMessageToWorkspace(MessageDTO messageDTO) {
     Message message = convertToMap(messageDTO);
     simpMessagingTemplate.convertAndSend("/topic/messages " + messageDTO.getWorkspaceId(), messageDTO);
+    redisTemplate.opsForList().rightPush("workspace:" + messageDTO.getWorkspaceId() + ":messages", message);
     message.setSentAt(new Date());
     messageRepository.save(message);
   }
@@ -65,6 +70,11 @@ public class MessageServiceImpl implements MessageService {
   @RateLimiter(name = "userBreaker" , fallbackMethod = "userBreakerFallback")
   public User getUser(String username) {
       return userClient.getUser(username);
+  }
+
+  @Override
+  public List<Message> getMessages(UUID userId) {
+    return List.of();
   }
 
   private User userBreakerFallback(Exception e){

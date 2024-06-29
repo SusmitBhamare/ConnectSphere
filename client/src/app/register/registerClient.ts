@@ -16,6 +16,18 @@ export async function doesUserExist(username : string){
 }
 
 
+export async function getUser(username: string) {
+  try {
+    const response = await axios.get(url + '/util/user/' + username);
+    return response.data
+  } catch (e) {
+    if (axios.isAxiosError(e) && e.response?.status === 404) {
+      return null;
+    }
+  }
+}
+
+
 export async function register(data : SignupSchema){
   try{
     const response = axios.post(url + "/auth/register" , data);
