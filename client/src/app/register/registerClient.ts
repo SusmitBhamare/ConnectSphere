@@ -6,7 +6,7 @@ import { toast } from "sonner";
 const url = 'http://localhost:3000/api/user';
 export async function doesUserExist(username : string){
   try{
-    const response = await axios.get(url + '/util/user/' + username);
+    const response = await axios.get(url + '/util/verify/user/' + username);
     return true;
   } catch(e){
     if (axios.isAxiosError(e) && e.response?.status === 404) {
@@ -16,9 +16,13 @@ export async function doesUserExist(username : string){
 }
 
 
-export async function getUser(username: string) {
+export async function getUser(username: string , token : string | undefined) {
   try {
-    const response = await axios.get(url + '/util/user/' + username);
+    const response = await axios.get(url + '/util/user/' + username , {
+      headers : {
+        "Authorization" : `Bearer ${token}`
+      }
+    });
     return response.data
   } catch (e) {
     if (axios.isAxiosError(e) && e.response?.status === 404) {
@@ -30,10 +34,12 @@ export async function getUser(username: string) {
 
 export async function register(data : SignupSchema){
   try{
-    const response = axios.post(url + "/auth/register" , data);
+    const response = await axios.post(url + "/auth/register" , data);
     toast.success('User registered successfully');
+    return true;
   } catch(e){
     toast.error('Failed to register user');
+    return false;
   }
 
 }

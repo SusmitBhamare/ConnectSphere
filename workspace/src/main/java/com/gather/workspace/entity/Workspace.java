@@ -21,4 +21,6 @@ public class Workspace {
     private String description;
     @ElementCollection
     private Collection<UUID> members;
+    private UUID createdBy;
+    private String image;
 }

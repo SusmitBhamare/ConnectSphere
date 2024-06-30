@@ -13,9 +13,11 @@ import Image from 'next/image';
 import { generateQuote } from '../utils/randomQuoteGenerator';
 import register_image from '../../assets/images/register.jpg';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const Register = () => {
   const [quote, setQuote] = useState<{ quote: string; author: string }>({quote : "" , author : ""});
+  const router = useRouter();
   const form = useForm<SignupSchema>({
     resolver : zodResolver(signupSchema)
   })
@@ -23,10 +25,18 @@ const Register = () => {
   const registerHandler: SubmitHandler<SignupSchema> = async ( data ) => {
     const isUser = await doesUserExist(data.username);
     if(isUser){
-      toast.error('User already exists');
+      toast.error('Username already taken');
       return;
     }
-    await register(data);
+    if(await register(data)){
+      form.reset({
+        name: "",
+        username: "",
+        email: "",
+        password: ""
+      })
+      router.push('/login');
+    }
   }
 
   

@@ -20,17 +20,5 @@ public class ModController {
 
     private final UserService userService;
 
-    @PutMapping("/workspace")
-    public ResponseEntity<String> updateWorkspace(@AuthenticationPrincipal UserDetails userDetails, @RequestBody UUID workspaceId) {
-        if(userService.getWorkSpaceById(workspaceId) == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Workspace not found");
-        }
-        try{
-            userService.updateWorkspace(userDetails.getUsername(), workspaceId);
-            return ResponseEntity.ok("Workspace updated");
-        } catch(IllegalArgumentException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
 
-    }
 }

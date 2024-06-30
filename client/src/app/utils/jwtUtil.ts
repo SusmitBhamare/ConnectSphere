@@ -1,21 +1,23 @@
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
-import { getUser } from "../register/registerClient";
+import axios from "axios";
 
-export function isLoggedIn(){
+const url = 'http://localhost:8081/util';
+
+export function isLoggedIn() {
   const cookieStore = cookies();
   const token = cookieStore.get('token');
   return token ? true : false;
 }
 
-export function getToken(){
+export function getToken() {
   const cookieStore = cookies();
   const token = cookieStore.get('token');
   return token;
 }
 
-export function extractClaims(token : string | undefined){
-  if(token){
+export function extractClaims(token: string | undefined) {
+  if (token) {
     const claims = jwt.decode(token);
     return claims;
   }
@@ -23,16 +25,20 @@ export function extractClaims(token : string | undefined){
 }
 
 
-export async function getAuth(){
-  const claims: null | jwt.JwtPayload | string = extractClaims(
-    getToken()?.value ?? ''
-  );
-
-  let user;
-  if (claims && typeof claims === "object") {
-    if (claims.sub) {
-      user = await getUser(claims.sub);
+export async function getAuth() {
+  const token = getToken()?.value;
+  if (token) {
+    try {
+      const response = await axios.get(url + "/profile", {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      return response.data;
+    } catch (e) {
+      if (axios.isAxiosError(e) && e.response?.status === 404) {
+        return null;
+      }
     }
   }
-  return user;
 }

@@ -1,5 +1,7 @@
 package com.gather.workspace.auth;
 
+import com.gather.workspace.client.UserClient;
+import com.gather.workspace.dummy.UserAllDetailsDTO;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -8,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -20,6 +23,7 @@ import java.util.ArrayList;
 public class JWTAuthFilter extends OncePerRequestFilter{
 
     private final JWTUtil jwtService;
+    private final UserClient userClient;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -28,6 +32,8 @@ public class JWTAuthFilter extends OncePerRequestFilter{
         final String authorizationHeader = request.getHeader("Authorization");
 
         String jwt = null;
+
+
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);

@@ -4,12 +4,10 @@ import { Button } from "../ui/button";
 import { HiPlusCircle } from "react-icons/hi2";
 import {
   Command,
-  CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
-  CommandSeparator,
 } from "@/components/ui/command";
 
 import {
@@ -59,7 +57,7 @@ function WorkspaceModel({ loggedUser , cookie }: { loggedUser: string , cookie: 
 
   const debouncedResults = useCallback(
     debounce(async (username: string) => {
-      const result = await getUser(username);
+      const result = await getUser(username , cookie);
       if (result) {
         if (
           result.username === username &&
@@ -91,18 +89,16 @@ function WorkspaceModel({ loggedUser , cookie }: { loggedUser: string , cookie: 
 
   const createWorkspaceHandler: SubmitHandler<WorkspaceSchema> = async (data) => {
     const userIds = selectedUsers.reduce((acc , user) => {acc.push(user.id); return acc} , [] as string[]);
-    try{
-      await createWorkspace({ ...data, users: userIds } ,cookie);
-      toast.success("Workspace created successfully");
-      form.reset({
-        name: "",
-        description : "",
-      });
-      setCurrentUser("");
-      // document.getElementById("closeDialog")?.click();
-    } catch(e){
-      toast.error('Failed to create workspace');
-    }
+
+      if(await createWorkspace({ ...data, members: userIds } ,cookie)){
+        form.reset({
+          name: "",
+          description : "",
+        });
+        setCurrentUser("");
+      }
+      
+
   };
 
   

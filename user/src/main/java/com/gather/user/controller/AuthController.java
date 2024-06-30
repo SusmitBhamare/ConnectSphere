@@ -3,6 +3,7 @@ package com.gather.user.controller;
 import com.gather.user.service.impl.RedisService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,8 +38,8 @@ public class AuthController {
   }
 
   @PostMapping("/logout")
-  public ResponseEntity<String> logout(@AuthenticationPrincipal User user , HttpServletResponse response){
-    authService.logout(user, response);
+  public ResponseEntity<String> logout(@AuthenticationPrincipal UserDetails userDetails , HttpServletResponse response){
+    authService.logout(userDetails, response);
     return ResponseEntity.ok().body("Logged out successfully");
   }
 }

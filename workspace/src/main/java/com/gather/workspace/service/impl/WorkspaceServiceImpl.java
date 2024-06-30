@@ -1,11 +1,11 @@
 package com.gather.workspace.service.impl;
 
 import com.gather.workspace.client.UserClient;
+import com.gather.workspace.dummy.UserAllDetailsDTO;
 import com.gather.workspace.entity.Workspace;
 import com.gather.workspace.repository.WorkspaceRepository;
 import com.gather.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +20,17 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     @Override
     public void createWorkspace(Workspace workspace) {
-        repository.save(workspace);
-        userClient.updateWorkspace(workspace.getId());
+        UserAllDetailsDTO user = userClient.getProfile();
+        if(user != null){
+            workspace.setCreatedBy(user.getId());
+            repository.save(workspace);
+            userClient.updateWorkspace(user.getId() , workspace.getId());
+        }
+
+        for(UUID member : workspace.getMembers()){
+            userClient.updateWorkspace(member ,workspace.getId());
+        }
+
     }
 
     @Override

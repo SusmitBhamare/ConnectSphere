@@ -2,7 +2,6 @@ package com.gather.workspace.service;
 
 
 import com.gather.workspace.entity.Workspace;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.UUID;

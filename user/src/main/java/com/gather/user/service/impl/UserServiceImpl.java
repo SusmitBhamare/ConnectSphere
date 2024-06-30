@@ -1,6 +1,7 @@
 package com.gather.user.service.impl;
 
 import com.gather.user.client.WorkspaceClient;
+import com.gather.user.dto.UserAllDetailsDTO;
 import com.gather.user.dummy.Workspace;
 import com.gather.user.entity.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +14,7 @@ import com.gather.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -37,8 +39,8 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void updateWorkspace(String username, UUID workspaceId) {
-    User user = userRepository.findByUsername(username).orElse(null);
+  public void updateWorkspace(UUID userId, UUID workspaceId) {
+    User user = userRepository.findById(userId).orElse(null);
     if(user != null){
       Collection<UUID> workspaces = user.getWorkspaces();
       if(workspaces.contains(workspaceId)){
@@ -54,6 +56,44 @@ public class UserServiceImpl implements UserService {
   @Override
   public Workspace getWorkSpaceById(UUID workspaceId) {
     return workspaceClient.getWorkspaceById(workspaceId);
+  }
+
+  @Override
+  public List<Workspace> getWorkspaces(UserDetails userDetails) {
+
+    User user = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
+    List<Workspace> workspaces = new ArrayList<>();
+    if(user != null){
+    Collection<UUID> workspacesUUID = user.getWorkspaces();
+    for(UUID workspaceId : workspacesUUID){
+      workspaces.add(workspaceClient.getWorkspaceById(workspaceId));
+    }
+    }
+    return workspaces;
+  }
+
+  @Override
+  public UserAllDetailsDTO getUserByUsername(String username) {
+    User user = userRepository.findByUsername(username).orElse(null);
+    if(user == null){
+      return null;
+    }
+    UserAllDetailsDTO userAllDetailsDTO = new UserAllDetailsDTO();
+    userAllDetailsDTO.setId(user.getId());
+    userAllDetailsDTO.setName(user.getName());
+    userAllDetailsDTO.setImage(user.getImage());
+    userAllDetailsDTO.setEmail(user.getEmail());
+    userAllDetailsDTO.setRole(user.getRole());
+    userAllDetailsDTO.setUsername(user.getUsername());
+    userAllDetailsDTO.setWorkspaces(new ArrayList<>());
+    for(UUID workspaceId : user.getWorkspaces()){
+      userAllDetailsDTO.getWorkspaces().add(workspaceClient.getWorkspaceById(workspaceId));
+    }
+    userAllDetailsDTO.setMessagesReceived(new ArrayList<>());
+    // To add messages via message client
+    userAllDetailsDTO.setMessagesSent(new ArrayList<>());
+
+    return userAllDetailsDTO;
   }
 
 }

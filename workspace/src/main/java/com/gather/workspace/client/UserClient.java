@@ -2,12 +2,10 @@ package com.gather.workspace.client;
 
 
 import com.gather.workspace.auth.FeignClientConfiguration;
-import com.gather.workspace.dummy.User;
-import feign.Headers;
+import com.gather.workspace.dummy.UserAllDetailsDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.UUID;
@@ -16,10 +14,10 @@ import java.util.UUID;
 @FeignClient(name = "USERSERVICE" , url = "${user-service.url}", configuration = FeignClientConfiguration.class)
 public interface UserClient {
 
-    @GetMapping("/util/user/{username}")
-    User getUser(@PathVariable String username);
+    @GetMapping("/util/profile")
+    UserAllDetailsDTO getProfile();
 
-    @PutMapping("/mod/workspace")
-    void updateWorkspace(UUID workspaceId);
+    @PutMapping("/util/user/workspace/{userId}")
+    void updateWorkspace(@PathVariable UUID userId, UUID workspaceId);
 
 }

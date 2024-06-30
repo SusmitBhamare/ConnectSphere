@@ -19,6 +19,7 @@ import Link from "next/link";
 import Image from "next/image";
 import login_image from "../../assets/images/login.jpg";
 import { generateQuote } from "../utils/randomQuoteGenerator";
+import { toast } from "sonner";
 
 const Login = () => {
   const [quote, setQuote] = useState<{ quote: string; author: string }>({
@@ -31,7 +32,12 @@ const Login = () => {
   });
 
   const loginHandler: SubmitHandler<LoginSchema> = async (data) => {
-    login(data).then(() => router.push("/"));
+    await(login(data));
+    form.reset({
+      username: "",
+      password: "",
+    })
+    router.push('/chat');
   };
 
   useEffect(() => {

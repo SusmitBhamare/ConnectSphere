@@ -5,6 +5,8 @@ import Link from "next/link";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import Cookie from "js-cookie";
+
 
 function Home({ token }: { token: string | undefined }) {
   const router = useRouter();
@@ -22,6 +24,7 @@ function Home({ token }: { token: string | undefined }) {
       .catch((e) => {
         toast.error("Error logging out");
       });
+        
   };
   return (
     <>
