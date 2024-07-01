@@ -25,3 +25,16 @@ export async function createWorkspace(data : WorkspaceData , token : string | un
     return false;
   }
 }
+
+export async function getMembers(workspaceId : string , token : string | undefined){
+  try{
+    const response = await axios.get(workspaceUrl + "/workspace/members/" + workspaceId , {
+      headers : {
+        'Authorization' : `Bearer ${token}`
+      }
+    })
+    return response.data;
+    } catch(e){
+      toast.error('Error fetching members');
+    }
+  }

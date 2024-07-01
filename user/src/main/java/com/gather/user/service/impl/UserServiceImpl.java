@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void updateWorkspace(UUID userId, UUID workspaceId) {
+  public void addUserToWorkspace(UUID userId, UUID workspaceId) {
     User user = userRepository.findById(userId).orElse(null);
     if(user != null){
       Collection<UUID> workspaces = user.getWorkspaces();
@@ -75,6 +75,10 @@ public class UserServiceImpl implements UserService {
   @Override
   public UserAllDetailsDTO getUserByUsername(String username) {
     User user = userRepository.findByUsername(username).orElse(null);
+    return userToUserAllDetailsDTO(user);
+  }
+
+  private UserAllDetailsDTO userToUserAllDetailsDTO(User user){
     if(user == null){
       return null;
     }
@@ -94,6 +98,27 @@ public class UserServiceImpl implements UserService {
     userAllDetailsDTO.setMessagesSent(new ArrayList<>());
 
     return userAllDetailsDTO;
+  }
+
+
+  @Override
+  public UserAllDetailsDTO getUserById(UUID userId) {
+    User user = userRepository.findById(userId).orElse(null);
+    return userToUserAllDetailsDTO(user);
+  }
+
+  @Override
+  public void removeUserFromWorkspace(UUID userId, UUID workspaceId) {
+    User user = userRepository.findById(userId).orElse(null);
+    if(user != null){
+      Collection<UUID> workspaces = user.getWorkspaces();
+      if(!workspaces.contains(workspaceId)){
+        throw new IllegalArgumentException("User does not have this workspace");
+      }
+      workspaces.remove(workspaceId);
+      user.setWorkspaces(workspaces);
+      userRepository.save(user);
+    }
   }
 
 }

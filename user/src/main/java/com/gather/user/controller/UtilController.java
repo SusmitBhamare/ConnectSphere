@@ -31,6 +31,15 @@ public class UtilController {
         return ResponseEntity.ok(user);
     }
 
+    @GetMapping("/user/id/{userId}")
+    public ResponseEntity<UserAllDetailsDTO> getUserById(@PathVariable UUID userId) {
+        UserAllDetailsDTO user = userService.getUserById(userId);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok(user);
+    }
+
     @GetMapping("/user/verify/{username}")
     public ResponseEntity<String> verifyUser(@PathVariable String username) {
         User user = utilService.getUser(username);
@@ -42,22 +51,41 @@ public class UtilController {
 
     @GetMapping("/profile")
     public ResponseEntity<UserAllDetailsDTO> getProfile(@AuthenticationPrincipal UserDetails userDetails){
-        return ResponseEntity.ok(userService.getUserByUsername(userDetails.getUsername()));
+        try{
+            return ResponseEntity.ok(userService.getUserByUsername(userDetails.getUsername()));
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
 
     @PutMapping("/user/workspace/{userId}")
-    public ResponseEntity<String> updateWorkspace(@PathVariable UUID userId, @RequestBody UUID workspaceId) {
+    public ResponseEntity<String> addUserToWorkspace(@PathVariable UUID userId, @RequestBody UUID workspaceId) {
         if(userService.getWorkSpaceById(workspaceId) == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Workspace not found");
         }
         try{
-            userService.updateWorkspace(userId, workspaceId);
+            userService.addUserToWorkspace(userId, workspaceId);
             return ResponseEntity.ok("Workspace updated");
         } catch(IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
     }
+
+    @DeleteMapping("/user/workspace/{userId}")
+    public ResponseEntity<String> removeUserFromWorkspace(@PathVariable UUID userId, @RequestBody UUID workspaceId) {
+        if(userService.getWorkSpaceById(workspaceId) == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Workspace not found");
+        }
+        try{
+            userService.removeUserFromWorkspace(userId, workspaceId);
+            return ResponseEntity.ok("Workspace updated");
+        } catch(IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+
 
 }

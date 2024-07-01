@@ -1,5 +1,6 @@
 package com.gather.workspace.dummy;
 
+import com.gather.workspace.entity.Workspace;
 import lombok.Data;
 
 import java.util.Collection;
@@ -16,6 +17,6 @@ public class User {
     private Role role;
     private Collection<UUID> messagesSent;
     private Collection<UUID> messagesReceived;
-    private Collection<UUID> workspaces;
+    private Collection<Workspace> workspaces;
 
 }

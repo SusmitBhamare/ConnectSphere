@@ -50,8 +50,8 @@ public class AuthServiceImpl implements AuthService{
     String token = jwtService.generateToken(user);
 
     Cookie tokenCookie = new Cookie("token" , token);
-    tokenCookie.setHttpOnly(true);
     tokenCookie.setPath("/");
+    tokenCookie.setHttpOnly(false);
     tokenCookie.setMaxAge(10*60*60);
     response.addCookie(tokenCookie);
 

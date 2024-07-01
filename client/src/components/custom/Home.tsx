@@ -6,6 +6,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Cookie from "js-cookie";
+import useUserStore from "@/app/zustand/store";
 
 
 function Home({ token }: { token: string | undefined }) {
@@ -18,6 +19,7 @@ function Home({ token }: { token: string | undefined }) {
         }
       })
       .then((res) => {
+        useUserStore.getState().setToken(null);
         router.push("/login");
         toast.success("Logged out successfully");
       })

@@ -44,10 +44,9 @@ import { Label } from "../ui/label";
 import { FaTrash } from "react-icons/fa6";
 import { createWorkspace } from "@/app/chat/workspaceClient";
 import { User } from "@/app/types/User";
-import { toast } from "sonner";
 
 
-function WorkspaceModel({ loggedUser , cookie }: { loggedUser: string , cookie: string | undefined}) {
+function WorkspaceModel({ loggedUser , cookie , setWorkspaceCreated }: { loggedUser: string , cookie: string | undefined , setWorkspaceCreated : (value : boolean) => void}) {
   const [searchUser, setSearchUser] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<string>("");
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
@@ -95,6 +94,7 @@ function WorkspaceModel({ loggedUser , cookie }: { loggedUser: string , cookie: 
           name: "",
           description : "",
         });
+        setWorkspaceCreated(true);
         setCurrentUser("");
       }
       

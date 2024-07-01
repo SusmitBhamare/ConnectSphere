@@ -17,10 +17,25 @@ export async function doesUserExist(username : string){
 
 
 export async function getUser(username: string , token : string | undefined) {
-  try {
+  try {    
     const response = await axios.get(url + '/util/user/' + username , {
       headers : {
         "Authorization" : `Bearer ${token}`
+      }
+    });
+    return response.data
+  } catch (e) {
+    if (axios.isAxiosError(e) && e.response?.status === 404) {
+      return null;
+    }
+  }
+}
+
+export async function getUserById(id: string, token: string | undefined) {
+  try {
+    const response = await axios.get(url + '/util/user/id/' + id, {
+      headers: {
+        "Authorization": `Bearer ${token}`
       }
     });
     return response.data

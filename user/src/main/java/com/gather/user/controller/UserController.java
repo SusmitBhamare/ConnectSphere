@@ -1,6 +1,7 @@
 package com.gather.user.controller;
 
 
+import com.gather.user.dto.WorkspaceDTO;
 import com.gather.user.dummy.Workspace;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

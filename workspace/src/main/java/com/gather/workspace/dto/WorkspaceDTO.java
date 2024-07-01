@@ -1,5 +1,6 @@
-package com.gather.user.dto;
+package com.gather.workspace.dto;
 
+import com.gather.workspace.dummy.User;
 import lombok.Data;
 
 import java.util.Collection;
@@ -10,7 +11,7 @@ public class WorkspaceDTO {
     private UUID id;
     private String name;
     private String description;
-    private Collection<UserAllDetailsDTO> members;
-    private UserAllDetailsDTO createdBy;
+    private Collection<User> members;
+    private User createdBy;
     private String image;
 }

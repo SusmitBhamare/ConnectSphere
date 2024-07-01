@@ -1,6 +1,7 @@
 package com.gather.user.client;
 
 import com.gather.user.auth.FeignClientConfiguration;
+import com.gather.user.dto.WorkspaceDTO;
 import com.gather.user.dummy.Workspace;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;

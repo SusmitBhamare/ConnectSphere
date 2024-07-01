@@ -1,19 +1,54 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
-import React from 'react'
-import { Input } from '../ui/input';
-import { getAuth, getToken } from '@/app/utils/jwtUtil';
-import WorkspaceModel from './WorkspaceModel';
+"use client";
+import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import React, { useEffect, useState } from "react";
+import { Input } from "../ui/input";
+import WorkspaceModel from "./WorkspaceModel";
+import { User } from "@/app/types/User";
+import axios from "axios";
+import { Skeleton } from "../ui/skeleton";
+import ChatSkeleton from "./ChatSkeleton";
 
+function Sidebar({
+  cookie,
+  setSelectedChat,
+}: {
+  cookie: string | undefined;
+  setSelectedChat: (workspace: Workspace) => void;
+}) {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading , setIsLoading] = useState<boolean>(true)
+  const [workspaceCreated, setWorkspaceCreated] = useState(false);
+  const [isActive, setisActive] = useState<string>("");
 
-async function Sidebar() {
-  let user;
-  try{
-    user = await getAuth();
-  } catch(e){
-    user = null;
-  }
-  console.log(user);
-  const cookie = getToken()?.value;
+  const getAuth = async (token: string | undefined) => {
+    const url = "http://localhost:8081/util";
+    if (token) {
+      try {
+        const response = await axios.get(url + "/profile", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        return response.data;
+      } catch (e) {
+        if (axios.isAxiosError(e) && e.response?.status === 404) {
+          return null;
+        }
+      }
+    }
+  };
+
+  const handleSelectChat = (workspace: Workspace) => {
+    setSelectedChat(workspace);
+    setisActive(workspace?.id);
+  };
+
+  useEffect(() => {
+    getAuth(cookie).then((data) => {
+      setUser(data);
+      setIsLoading(false);
+    });
+  }, [workspaceCreated]);
 
   return (
     <div className="flex flex-col min-h-full w-full justify-between items-center  shadow-lg">
@@ -23,60 +58,96 @@ async function Sidebar() {
           className="my-2 rounded-full"
           placeholder="Search for users or workspaces"
         />
-        <UserChat isActive={false} />
-        <UserChat isActive={false} />
-        <UserChat isActive={false} />
-        <UserChat isActive={true} />
-        {
-          user?.workspaces &&  user.workspaces.map((workspace : Workspace) => (
-            <WorkspaceChat name={workspace.name} url={workspace.image} />
-          ))
-        }
+        {/* <UserChat isActive={isActive} />
+        <UserChat isActive={isActive} />
+        <UserChat isActive={isActive} />
+        <UserChat isActive={isActive} /> */}
+
+        {isLoading && (
+          <>
+            <ChatSkeleton/>
+            <ChatSkeleton/>
+            <ChatSkeleton/>
+            <ChatSkeleton/>
+          </>
+ 
+        )}
+
+        {user?.workspaces &&
+          user.workspaces.map((workspace: Workspace) => (
+            <WorkspaceChat
+              workspace={workspace}
+              isActive={isActive === workspace?.id}
+            />
+          ))}
       </div>
 
-
       {user && user.role === "MOD" && (
-        <WorkspaceModel loggedUser={user.username} cookie={cookie}/>
+        <WorkspaceModel
+          loggedUser={user.username}
+          cookie={cookie}
+          setWorkspaceCreated={setWorkspaceCreated}
+        />
       )}
     </div>
   );
 
-  function WorkspaceChat({name , url } : {name : string, url : string}){
-       return (
-         <div
-           className=
-             {"bg-zinc-900 h-max w-full flex flex-row items-center px-4 gap-3 py-2"}
-         >
-           <Avatar className="rounded-full ring ring-primary/50">
-             <AvatarImage
-               className="rounded-full w-8"
-               src={url}
-               alt="@shadcn"
-             />
-             <AvatarFallback>CN</AvatarFallback>
-           </Avatar>
-           <div>
-             <h1>{name}</h1>
-             <p className="text-muted-foreground text-xs">
-               Sounds good ! Thank you
-             </p>
-           </div>
-         </div>
-       );
+  function WorkspaceChat({
+    workspace,
+    isActive,
+  }: {
+    workspace: Workspace;
+    isActive: boolean;
+  }) {
+    return (
+      <div
+        onClick={() => handleSelectChat(workspace)}
+        className={`${
+          isActive ? "bg-primary/30" : "bg-zinc-900"
+        } h-max w-full flex flex-row items-center px-4 gap-3 py-2 cursor-pointer`}
+      >
+        <Avatar className="rounded-full ring ring-primary/50">
+          <AvatarImage
+            className="rounded-full w-8"
+            src={workspace?.image}
+            alt="@shadcn"
+          />
+          <AvatarFallback>CN</AvatarFallback>
+        </Avatar>
+        <div>
+          <h1>{workspace?.name}</h1>
+          <p className="text-muted-foreground text-xs">
+            Sounds good ! Thank you
+          </p>
+        </div>
+      </div>
+    );
   }
 
-  function UserChat({isActive} : {isActive : boolean}) {
-    return <div className={`${isActive ? "bg-primary/30" : "bg-zinc-900"} h-max w-full flex flex-row items-center px-4 gap-3 py-2`}>
-      <Avatar className='rounded-full ring ring-primary/50'>
-        <AvatarImage className='rounded-full w-8' src="https://github.com/shadcn.png" alt="@shadcn" />
-        <AvatarFallback>CN</AvatarFallback>
-      </Avatar>
-      <div>
-        <h1>Ruchita Parekh</h1>
-        <p className='text-muted-foreground text-xs'>Sounds good ! Thank you</p>
+  function UserChat({ isActive }: { isActive: boolean }) {
+    return (
+      <div
+        className={`${
+          isActive ? "bg-primary/30" : "bg-zinc-900"
+        } h-max w-full flex flex-row items-center px-4 gap-3 py-2`}
+      >
+        <Avatar className="rounded-full ring ring-primary/50">
+          <AvatarImage
+            className="rounded-full w-8"
+            src="https://github.com/shadcn.png"
+            alt="@shadcn"
+          />
+          <AvatarFallback>CN</AvatarFallback>
+        </Avatar>
+        <div>
+          <h1>Ruchita Parekh</h1>
+          <p className="text-muted-foreground text-xs">
+            Sounds good ! Thank you
+          </p>
+        </div>
       </div>
-    </div>;
+    );
   }
 }
 
-export default Sidebar
+export default Sidebar;
