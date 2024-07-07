@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "USERSERVICE" , url = "${user-service.url}")
 public interface UserClient {
 
-    @GetMapping("/util/user/{username}")
-    User getUser(@PathVariable String username);
+    @GetMapping("/util/user/verify/{username}")
+    String verifyUser(@PathVariable String username);
 
 }

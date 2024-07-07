@@ -23,7 +23,6 @@ async function getCurrentUser() {
         Authorization: `Bearer ${useUserStore.getState().token}`,
       }
     });
-    console.log(response.data);
 
     return response.data;
   } catch (e) {

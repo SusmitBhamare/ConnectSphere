@@ -8,6 +8,7 @@ import lombok.Data;
 
 @Data
 public class MessageDTO {
+    private UUID id;
   private Collection<UUID> receiverIds;
   private String content;
   private UUID senderId;

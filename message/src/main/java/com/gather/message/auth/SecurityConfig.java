@@ -19,11 +19,11 @@ public class SecurityConfig {
     private final JWTAuthFilter jwtAuthFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
-        httpSecurity.csrf(AbstractHttpConfigurer:: disable)
-                .authorizeHttpRequests(req -> req.requestMatchers("/ws/app/**").authenticated()
-                        .requestMatchers("/ws/**").permitAll())
-
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity.csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(req -> req
+                        .requestMatchers("/ws/app/**", "/ws/topic/**").authenticated()
+                        .anyRequest().permitAll()) // This line replaces the problematic requestMatchers("") call
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

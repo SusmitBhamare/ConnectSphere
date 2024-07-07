@@ -3,52 +3,30 @@ import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import React, { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import WorkspaceModel from "./WorkspaceModel";
-import { User } from "@/app/types/User";
-import axios from "axios";
-import { Skeleton } from "../ui/skeleton";
 import ChatSkeleton from "./ChatSkeleton";
+import useUserStore from "@/app/zustand/store";
+import { Workspace } from "@/app/types/Workspace";
 
 function Sidebar({
-  cookie,
   setSelectedChat,
 }: {
-  cookie: string | undefined;
   setSelectedChat: (workspace: Workspace) => void;
 }) {
-  const [user, setUser] = useState<User | null>(null);
   const [isLoading , setIsLoading] = useState<boolean>(true)
   const [workspaceCreated, setWorkspaceCreated] = useState(false);
   const [isActive, setisActive] = useState<string>("");
-
-  const getAuth = async (token: string | undefined) => {
-    const url = "http://localhost:8081/util";
-    if (token) {
-      try {
-        const response = await axios.get(url + "/profile", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        return response.data;
-      } catch (e) {
-        if (axios.isAxiosError(e) && e.response?.status === 404) {
-          return null;
-        }
-      }
-    }
-  };
-
+  const {fetchUser , user} = useUserStore();
+  
   const handleSelectChat = (workspace: Workspace) => {
     setSelectedChat(workspace);
     setisActive(workspace?.id);
   };
 
   useEffect(() => {
-    getAuth(cookie).then((data) => {
-      setUser(data);
-      setIsLoading(false);
-    });
-  }, [workspaceCreated]);
+    fetchUser();
+    setIsLoading(false);
+  }, [workspaceCreated , fetchUser]);
+  
 
   return (
     <div className="flex flex-col min-h-full w-full justify-between items-center  shadow-lg">
@@ -84,8 +62,6 @@ function Sidebar({
 
       {user && user.role === "MOD" && (
         <WorkspaceModel
-          loggedUser={user.username}
-          cookie={cookie}
           setWorkspaceCreated={setWorkspaceCreated}
         />
       )}

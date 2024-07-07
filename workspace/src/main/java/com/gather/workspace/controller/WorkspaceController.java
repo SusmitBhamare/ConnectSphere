@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -48,9 +49,9 @@ public class WorkspaceController {
     }
 
     @PutMapping("/add/{workspaceId}")
-    public ResponseEntity<String> addMember(@PathVariable UUID workspaceId , @RequestBody UUID userId){
+    public ResponseEntity<String> addMember(@PathVariable UUID workspaceId , @RequestBody Map<String , List<UUID>> userIdsMap){
         try{
-            workspaceService.addMember(workspaceId , userId);
+            workspaceService.addMember(workspaceId , userIdsMap);
             return ResponseEntity.ok("Member added");
         }catch(Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -58,11 +59,21 @@ public class WorkspaceController {
     }
 
     @PutMapping("/remove/{workspaceId}")
-    public ResponseEntity<String> removeMember(@PathVariable UUID workspaceId , @RequestBody UUID userId){
+    public ResponseEntity<String> removeMember(@PathVariable UUID workspaceId , @RequestBody Map<String,UUID> userIdMap){
         try{
-            workspaceService.removeMember(workspaceId , userId);
+            workspaceService.removeMember(workspaceId , userIdMap.get("userId"));
             return ResponseEntity.ok("Member removed");
         }catch(Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{workspaceId}")
+    public ResponseEntity<String> deleteWorkspace(@PathVariable UUID workspaceId){
+        try{
+            workspaceService.deleteWorkspace(workspaceId);
+            return ResponseEntity.ok("Workspace deleted");
+        } catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

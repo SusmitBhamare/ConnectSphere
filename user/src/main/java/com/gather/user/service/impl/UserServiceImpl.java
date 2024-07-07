@@ -116,7 +116,11 @@ public class UserServiceImpl implements UserService {
         throw new IllegalArgumentException("User does not have this workspace");
       }
       workspaces.remove(workspaceId);
-      user.setWorkspaces(workspaces);
+      if(workspaces.isEmpty()){
+        user.setWorkspaces(new ArrayList<>());
+      } else{
+        user.setWorkspaces(workspaces);
+      }
       userRepository.save(user);
     }
   }

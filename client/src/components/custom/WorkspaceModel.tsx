@@ -44,19 +44,24 @@ import { Label } from "../ui/label";
 import { FaTrash } from "react-icons/fa6";
 import { createWorkspace } from "@/app/chat/workspaceClient";
 import { User } from "@/app/types/User";
+import useUserStore from "@/app/zustand/store";
 
 
-function WorkspaceModel({ loggedUser , cookie , setWorkspaceCreated }: { loggedUser: string , cookie: string | undefined , setWorkspaceCreated : (value : boolean) => void}) {
+function WorkspaceModel({ setWorkspaceCreated }: { setWorkspaceCreated : (value : boolean) => void}) {
   const [searchUser, setSearchUser] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<string>("");
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
+  const [open, setOpen] = useState<boolean>(false);
   const form = useForm<WorkspaceSchema>({
     resolver: zodResolver(workspaceSchema),
   });
 
+  const cookie = useUserStore((state) => state.token);
+  const loggedUser = useUserStore((state) => state.user?.username);
+
   const debouncedResults = useCallback(
     debounce(async (username: string) => {
-      const result = await getUser(username , cookie);
+      const result = await getUser(username , cookie ? cookie : "");
       if (result) {
         if (
           result.username === username &&
@@ -89,13 +94,15 @@ function WorkspaceModel({ loggedUser , cookie , setWorkspaceCreated }: { loggedU
   const createWorkspaceHandler: SubmitHandler<WorkspaceSchema> = async (data) => {
     const userIds = selectedUsers.reduce((acc , user) => {acc.push(user.id); return acc} , [] as string[]);
 
-      if(await createWorkspace({ ...data, members: userIds } ,cookie)){
+      if(await createWorkspace({ ...data, members: userIds } ,cookie ? cookie : "")){
         form.reset({
           name: "",
           description : "",
         });
         setWorkspaceCreated(true);
         setCurrentUser("");
+        setSelectedUsers([]);
+        setOpen(false);
       }
       
 
@@ -104,7 +111,7 @@ function WorkspaceModel({ loggedUser , cookie , setWorkspaceCreated }: { loggedU
   
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
           className="w-full flex gap-2 items-center"

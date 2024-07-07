@@ -9,14 +9,10 @@ import java.util.UUID;
 
 public interface MessageService {
 
-  void sendMessage(MessageDTO messageDTO);
+  void sendMessage(Message messageDTO);
 
-  void sendMessageToWorkspace(MessageDTO messageDTO);
+  void sendMessageToWorkspace(Message messageDTO);
 
-  void deleteMessage(String messageId);
-
-  User getUser(String username);
-
-  List<Message> getMessages(UUID userId);
+  List<Message> getMessagesForWorkspace(UUID workspaceId);
 
 }

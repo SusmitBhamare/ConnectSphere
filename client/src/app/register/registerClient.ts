@@ -31,7 +31,7 @@ export async function getUser(username: string , token : string | undefined) {
   }
 }
 
-export async function getUserById(id: string, token: string | undefined) {
+export async function getUserById(id: string | undefined, token: string | undefined | null) {
   try {
     const response = await axios.get(url + '/util/user/id/' + id, {
       headers: {

@@ -6,13 +6,11 @@ import { message } from '../types/Message';
 const WEBSOCKET_URL = 'http://localhost:8082/ws';
 
 let stompClient: Client | null = null;
-const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtZWh1bDE0NCIsImlhdCI6MTcxOTI5NTkxMCwiZXhwIjoxNzE5MzMxOTEwfQ.- s8HTh_OgKy66CiosJT0Eajw2gYk40abN5_vwL1Zcfo";
-
 
 
 export const connect = (onMessageReceived: (message: any) => void): void => {
   const socket = new SockJS(WEBSOCKET_URL);
-  
+
   stompClient = new Client({
     webSocketFactory: () => socket,
     debug: (str) => {
@@ -28,15 +26,15 @@ export const connect = (onMessageReceived: (message: any) => void): void => {
   stompClient.activate();
 };
 
-export const sendMessage = (message: message): void => {
+export const sendMessage = (message: message , token : string | undefined | null): void => {
   if (stompClient && stompClient.connected) {
     console.log(message);
     stompClient.publish({
       destination: '/app/chat',
       body: JSON.stringify(message),
-      // headers : {
-      //   "Authorization" : `Bearer ${token}`
-      // }
+      headers : {
+        "Authorization" : `Bearer ${token}`
+      }
     });
   }
 };

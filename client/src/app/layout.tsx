@@ -22,7 +22,7 @@ export default function RootLayout({
       <Navbar />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}
-          <Toaster richColors />
+          <Toaster richColors theme="dark" />
         </ThemeProvider>
       </body>
     </html>

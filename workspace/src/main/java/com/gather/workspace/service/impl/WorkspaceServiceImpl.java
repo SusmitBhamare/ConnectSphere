@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -54,17 +55,20 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public void addMember(UUID workspaceId, UUID userId) {
-        if(userClient.getUserById(userId) == null){
-            throw new IllegalArgumentException("User not found");
-        }
+    public void addMember(UUID workspaceId, Map<String, List<UUID>> userIds) {
+        List<UUID> members = userIds.get("userIds");
         Workspace workspace = repository.findById(workspaceId).orElse(null);
         if(workspace == null){
             throw new IllegalArgumentException("Workspace not found");
         }
-        workspace.getMembers().add(userId);
+        for(UUID userId : members){
+            if(userClient.getUserById(userId) == null){
+                throw new IllegalArgumentException("User not found");
+            }
+            workspace.getMembers().add(userId);
+            userClient.addUserToWorkspace(userId , workspaceId);
+        }
         repository.save(workspace);
-        userClient.addUserToWorkspace(userId , workspaceId);
     }
 
     @Override
@@ -79,6 +83,21 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         workspace.getMembers().remove(userId);
         repository.save(workspace);
         userClient.removeUserFromWorkspace(userId , workspaceId);
+    }
+
+
+
+    @Override
+    public void deleteWorkspace(UUID workspaceId) {
+        Workspace workspace = repository.findById(workspaceId).orElse(null);
+        if(workspace == null){
+            throw new IllegalArgumentException("Workspace not found");
+        }
+        userClient.removeUserFromWorkspace(workspace.getCreatedBy() , workspaceId);
+        for(UUID member : workspace.getMembers()){
+            userClient.removeUserFromWorkspace(member , workspaceId);
+        }
+        repository.deleteById(workspaceId);
     }
 
 

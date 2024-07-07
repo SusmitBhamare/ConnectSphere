@@ -11,41 +11,58 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Separator } from "../ui/separator";
 import { Badge } from "../ui/badge";
 import { User } from "@/app/types/User";
-import { getMembers } from "@/app/chat/workspaceClient";
+import { getMembers, removeMember } from "@/app/chat/workspaceClient";
 import { getUserById } from "@/app/register/registerClient";
 import { Button } from "../ui/button";
 import useUserStore from "@/app/zustand/store";
 import { FaTrash } from "react-icons/fa6";
+import { toast } from "sonner";
+import AddMemberToWorkspace from "./AddMemberToWorkspace";
+import { Workspace } from "@/app/types/Workspace";
+import DeleteWorkspace from "./DeleteWorkspace";
 
 const WorkspaceMember = ({
   workspace,
-  cookie,
 }: {
   workspace: Workspace | null;
-  cookie: string | undefined;
 }) => {
+  const [open , setOpen] = useState<boolean>(false);
   const [members, setMembers] = useState<User[]>([]);
   const [mod, setMod] = useState<User | null>(null);
   const { user, token, fetchUser } = useUserStore();
+
 
   useEffect(() => {
     fetchUser();
   }, [fetchUser]);
 
   useEffect(() => {
-    if (workspace) {
-      getMembers(workspace.id, cookie).then((data) => {
+    if (workspace && token) {
+      getMembers(workspace.id, token).then((data) => {
         setMembers(data);
       });
 
-      getUserById(workspace.createdBy, cookie).then((data) => {
+      getUserById(workspace.createdBy, token).then((data) => {
         setMod(data);
       });
     }
   }, [workspace]);
 
+  async function removeMemberHandler(id: string) {
+    if(workspace){
+      if(await removeMember(workspace?.id , id , token)){
+        getMembers(workspace?.id , token).then((data)=>{
+          setMembers(data);
+        })
+        toast.success("Member removed successfully");
+      } else{
+        toast.error("Error removing member");
+      }
+    }
+  }
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <h1 className="font-primary text-lg cursor-pointer">
           {workspace?.name}
@@ -58,8 +75,8 @@ const WorkspaceMember = ({
           <div className="flex gap-4 items-center mb-2">
             <Avatar className="rounded-full ring ring-primary/50">
               <AvatarImage
-                className="rounded-full h-2 w-2"
-                src={""}
+                className="rounded-full h-16 w-16"
+                src={workspace?.image || ""}
                 alt="@shadcn"
               />
               <AvatarFallback>CN</AvatarFallback>
@@ -68,7 +85,7 @@ const WorkspaceMember = ({
             <div className="w-full">
               <div className="flex w-full justify-between text-sm items-center">
                 <h1>{mod?.name}</h1>
-                <Badge className="bg-destructive">Moderator</Badge>
+                <Badge variant={"outline"}>Moderator</Badge>
               </div>
               <p className="text-xs text-muted-foreground">{mod?.username}</p>
             </div>
@@ -93,18 +110,24 @@ const WorkspaceMember = ({
                   </div>
                 </div>
                 {user?.role === "MOD" && member.username !== user.username && (
-                  <Button size={"icon"} className="bg-destructive">
+                  <Button size={"icon"} onClick={()=>removeMemberHandler(member.id)} variant={"destructive"}>
                     <FaTrash />
                   </Button>
                 )}
               </div>
             ))}
         </div>
-        <DialogFooter>
-          <Button className="w-full" size={"sm"}>
-            Add Member
-          </Button>
+        {
+          user && user.role === "MOD" && (
+            <>
+            <Separator/>
+        <DialogFooter className="w-full flex items-center">
+          <AddMemberToWorkspace workspaceId={workspace?.id} setMembers={setMembers} members={members}/>
+          <DeleteWorkspace workspace={workspace} open={open} setOpen={setOpen}/>
         </DialogFooter>
+            </>
+          )
+        }
       </DialogContent>
     </Dialog>
   );

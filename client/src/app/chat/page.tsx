@@ -9,9 +9,8 @@ function page() {
   if(!isLoggedIn()){
     redirect("/login")
   } 
-  const cookie = getToken()?.value;
   return (
-    <ChatPage cookie={cookie}/>
+    <ChatPage />
   )
 }
 

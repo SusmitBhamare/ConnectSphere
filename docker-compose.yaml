@@ -1,4 +1,5 @@
-version: '3.8'
+version: '3'
+
 services:
   postgres:
     image: postgres:latest
@@ -25,7 +26,7 @@ services:
     networks:
       - employee-network
     volumes:
-      - ./pgadmin:/var/lib/pgadmin
+      - pgadmin:/var/lib/pgadmin
 
   redis:
     image: redis:latest
