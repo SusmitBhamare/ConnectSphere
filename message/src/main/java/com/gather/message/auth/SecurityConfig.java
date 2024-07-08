@@ -22,6 +22,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req -> req
+                        .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/ws/app/**", "/ws/topic/**").authenticated()
                         .anyRequest().permitAll()) // This line replaces the problematic requestMatchers("") call
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

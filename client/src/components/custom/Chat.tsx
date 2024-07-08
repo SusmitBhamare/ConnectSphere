@@ -14,14 +14,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import WorkspaceMember from "./WorkspaceMember";
 import useUserStore from "@/app/zustand/store";
 import { Workspace } from "@/app/types/Workspace";
-import SockJS from "sockjs-client";
-import { CompatClient, IMessage, Stomp } from "@stomp/stompjs";
 import { Message, MessageResponse, Status } from "@/app/types/Message";
-import axios from "axios";
-import { getMessages } from "@/app/chat/workspaceClient";
-import { getUserById } from "@/app/register/registerClient";
-import { User } from "@/app/types/User";
 import { ScrollArea } from "../ui/scroll-area";
+import SockJS from "sockjs-client";
+import {Client , Frame} from "stompjs";
+import { Stomp } from "@stomp/stompjs";
 
 function Chat({
   className,
@@ -30,7 +27,7 @@ function Chat({
   className?: string;
   selectedChat: Workspace | null;
 }) {
-  const [stompClient, setStompClient] = useState<CompatClient | null>(null);
+  const [stompClient, setStompClient] = useState<Client | null>(null);
   const [messageInput, setMessageInput] = useState<string>("");
   const [messages, setMessages] = useState<MessageResponse[]>([]);
   const [userStatus, setUserStatus] = useState<{ [userName: string]: boolean }>(
@@ -39,53 +36,27 @@ function Chat({
   const cookie = useUserStore((state) => state.token); // Assuming this fetches the token correctly
   const { fetchUser, user } = useUserStore();
 
+  const stompClientUrl = "http://localhost:8082/ws";
+
+  useEffect(() => {
+    const socket = new SockJS(stompClientUrl);
+    const stomp = Stomp.over(socket);
+
+    stomp.connect({} , () => {
+      setStompClient(stomp);
+      stomp.subscribe("/topic/messages/ " + selectedChat?.id , (message : Frame) => {
+        const newMessage : MessageResponse = JSON.parse(message.body);
+        setMessages((prevMessages) => [...prevMessages , newMessage]);
+      })
+    })
+
+
+  } , [stompClient , messageInput])
+
   useEffect(() => {
     fetchUser(); // Fetching user details
   }, [fetchUser]);
 
-  useEffect(() => {
-    if (!selectedChat) return; // Exit if no chat is selected
-
-    const socket = new SockJS("http://localhost:8082/ws");
-    const stomp = Stomp.over(socket);
-
-    stomp.connect(
-      {
-        headers: {
-          Authorization: `Bearer ${cookie}`, // Authorization header for WebSocket connection
-        },
-      },
-      () => {
-        setStompClient(stomp);
-      }
-    );
-
-    return () => {
-      if (stompClient) {
-        stompClient.disconnect(); // Disconnect WebSocket on unmount
-      }
-    };
-  }, [selectedChat, cookie]);
-
-  useEffect(() => {
-    if (!stompClient || !selectedChat) return;
-
-    const messageSubscription = stompClient.subscribe(
-      `/topic/messages/${selectedChat.id}`, // Subscribe to the topic specific to selected chat
-      (message) => {
-        console.log("Received message: ", message.body);
-        const messageResponse: MessageResponse = JSON.parse(message.body);
-        setMessages((prev) => [...prev, messageResponse]); // Update messages state
-      },
-      {
-        Authorization: `Bearer ${cookie}`, // Authorization header for subscription
-      }
-    );
-
-    return () => {
-      messageSubscription.unsubscribe(); // Unsubscribe when component unmounts or when selectedChat changes
-    };
-  }, [stompClient, selectedChat, cookie]);
 
   const sendMessage = () => {
     if (messageInput.trim() !== "" && stompClient && user && selectedChat) {
@@ -99,13 +70,14 @@ function Chat({
         status: Status.SENT,
       };
 
+
       stompClient.send(
-        "/app/chat", // Destination
+        "/app/chat" , 
         {
-          Authorization: `Bearer ${cookie}`, // Authorization header for sending message
-        },
-        JSON.stringify(message) // Message content
-      );
+          Authorization: `Bearer ${cookie}`
+        } , 
+        JSON.stringify(message)
+      )
 
       setMessageInput(""); // Clear input after sending message
     }
@@ -122,11 +94,14 @@ function Chat({
                 src={selectedChat.image}
                 alt={selectedChat.name} // Assuming selectedChat has 'image' and 'name' properties
               />
-              <AvatarFallback>{selectedChat.name.toLocaleUpperCase()[0]}</AvatarFallback>
+              <AvatarFallback>
+                {selectedChat.name.toLocaleUpperCase()[0]}
+              </AvatarFallback>
             </Avatar>
             <WorkspaceMember workspace={selectedChat} />
           </div>
           <div className="mt-4 mb-2 text-lg font-bold">Messages</div>
+          {/* <Button onClick={handleClick}>Click</Button> */}
           <ScrollArea className="h-96 rounded-md overflow-y-auto">
             {messages.map((message, index) => (
               <div

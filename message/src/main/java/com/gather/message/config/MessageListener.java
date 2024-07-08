@@ -16,6 +16,5 @@ public class MessageListener implements org.springframework.data.redis.connectio
         logger.info("Received message:{}  from pattern: {}", new String(message.getBody()), new String(pattern));
         String channel = new String(message.getChannel());
         String body = new String(message.getBody());
-        System.out.println("Received message from topic: " + channel + " with body: " + body);
     }
 }

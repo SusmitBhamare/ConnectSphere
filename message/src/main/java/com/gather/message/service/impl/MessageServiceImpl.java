@@ -25,7 +25,7 @@ public class MessageServiceImpl implements MessageService {
   private final SimpMessagingTemplate simpMessagingTemplate;
   private final MessageRepository messageRepository;
   private final UserClient userClient;
-  private final RedisTemplate<String,Message> redisTemplate;
+  private final RedisTemplate<String,Object> redisTemplate;
 
 
 
@@ -53,17 +53,18 @@ public class MessageServiceImpl implements MessageService {
 
   @Override
   public List<Message> getMessagesForWorkspace(UUID workspaceId) {
-    List<Message> messages = redisTemplate.opsForList().range("workspace:" + workspaceId + ":messages", 0, -1);
+    List<Object> messages = redisTemplate.opsForList().range("workspace:" + workspaceId + ":messages", 0, -1);
     if(messages == null){
       return new ArrayList<>();
     }
-    if(messages.isEmpty()){
-      messages = messageRepository.findAllByWorkspaceId(workspaceId);
-      for(Message message : messages){
-        redisTemplate.opsForList().rightPush("workspace:" + workspaceId + ":messages", message);
-      }
-    }
-    return messages;
+//    if(messages.isEmpty()){
+//      messages = messageRepository.findAllByWorkspaceId(workspaceId);
+//      for(Message message : messages){
+//        redisTemplate.opsForList().rightPush("workspace:" + workspaceId + ":messages", message);
+//      }
+//    }
+//    return messages;
+      return null;
   }
 
 
