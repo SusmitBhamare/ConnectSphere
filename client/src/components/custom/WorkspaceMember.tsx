@@ -119,13 +119,13 @@ const WorkspaceMember = ({
         </div>
         {
           user && user.role === "MOD" && (
-            <>
+            <div>
             <Separator/>
         <DialogFooter className="w-full flex items-center">
           <AddMemberToWorkspace workspaceId={workspace?.id} setMembers={setMembers} members={members}/>
           <DeleteWorkspace workspace={workspace} open={open} setOpen={setOpen}/>
         </DialogFooter>
-            </>
+            </div>
           )
         }
       </DialogContent>

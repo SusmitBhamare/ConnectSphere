@@ -1,7 +1,11 @@
 package com.gather.user.auth;
 
+import feign.Logger;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+import feign.codec.Decoder;
+import feign.codec.Encoder;
+import feign.codec.ErrorDecoder;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,4 +37,6 @@ public class FeignClientConfiguration {
             }
         };
     }
+
+
 }

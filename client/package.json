@@ -31,6 +31,7 @@
     "cmdk": "^1.0.0",
     "cookie": "^0.6.0",
     "cookies-next": "^4.2.1",
+    "dateformat": "^5.0.3",
     "framer-motion": "^11.2.12",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
@@ -52,6 +53,7 @@
     "zustand": "^4.5.4"
   },
   "devDependencies": {
+    "@types/dateformat": "^5.0.2",
     "@types/js-cookie": "^3.0.6",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20",

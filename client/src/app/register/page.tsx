@@ -13,7 +13,7 @@ import Image from 'next/image';
 import { generateQuote } from '../utils/randomQuoteGenerator';
 import register_image from '../../assets/images/register.jpg';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 
 const Register = () => {
   const [quote, setQuote] = useState<{ quote: string; author: string }>({quote : "" , author : ""});

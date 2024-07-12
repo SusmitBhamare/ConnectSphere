@@ -81,15 +81,18 @@ export async function deleteWorkspace(workspaceId: string, token: string | undef
   }
 }
 
-export async function getMessages(workspaceId : string , token : string | undefined | null){
+
+export async function getMessagesForWorkspace(workspaceId : string, token : string | undefined | null){
+
   try{
-    const response = await axios.get(messageUrl + "/workspace/" + workspaceId , {
+    const response = await axios.get(messageUrl + "/messages/workspace/" + workspaceId , {
       headers : {
         'Authorization' : `Bearer ${token}`
       }
-    })
+    });
     return response.data;
   } catch(e){
     return null;
   }
+
 }

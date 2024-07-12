@@ -14,12 +14,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { login } from "./loginClient";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import "../globals.css";
 import login_image from "../../assets/images/login.jpg";
 import { generateQuote } from "../utils/randomQuoteGenerator";
-import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
   const [quote, setQuote] = useState<{ quote: string; author: string }>({
@@ -29,20 +29,23 @@ const Login = () => {
   const router = useRouter();
   const form = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+    },
   });
-
   const loginHandler: SubmitHandler<LoginSchema> = async (data) => {
-    await(login(data));
+    await login(data);
     form.reset({
       username: "",
       password: "",
-    })
-    router.push('/chat');
+    });
+    router.push("/chat");
   };
 
   useEffect(() => {
     setQuote(generateQuote());
-  }, []);
+  }, [quote]);
 
   return (
     <div className="min-h-screen max-w-screen flex flex-row justify-center items-center">
@@ -117,7 +120,10 @@ const Login = () => {
             </Button>
             <p className="text-muted-foreground text-sm ">
               Don't have an account?{" "}
-              <Link href="/register" className="text-primary font-medium underline-offset-1 underline">
+              <Link
+                href="/register"
+                className="text-primary font-medium underline-offset-1 underline"
+              >
                 Register
               </Link>
             </p>

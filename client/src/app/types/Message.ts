@@ -1,4 +1,5 @@
 import { User } from "./User"
+import { Workspace } from "./Workspace"
 
 export enum Status {
   READ,
@@ -18,11 +19,12 @@ export interface Message {
 }
 
 export interface MessageResponse {
-  receiverIds: string[] | undefined,
+  id : string,
+  receivers: User[] | undefined,
   content: string,
-  status: Status | undefined
-  senderId: User,
-  workspaceId: string | undefined,
+  status: string ,
+  sender: User,
+  workspaceId: Workspace | undefined,
   attachment: string | undefined,
   createdAt: Date | undefined
   sentAt?: Date

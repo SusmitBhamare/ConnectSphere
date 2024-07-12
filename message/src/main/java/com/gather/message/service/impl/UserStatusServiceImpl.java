@@ -1,7 +1,6 @@
 package com.gather.message.service.impl;
 
 import com.gather.message.dto.UserStatusDTO;
-import com.gather.message.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;

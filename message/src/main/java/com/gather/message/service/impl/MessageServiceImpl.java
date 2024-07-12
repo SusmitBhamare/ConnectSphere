@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.UUID;
 
 import com.gather.message.client.UserClient;
+import com.gather.message.client.WorkspaceClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -21,51 +24,94 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
-  
-  private final SimpMessagingTemplate simpMessagingTemplate;
-  private final MessageRepository messageRepository;
-  private final UserClient userClient;
-  private final RedisTemplate<String,Object> redisTemplate;
+
+    private static final Logger log = LoggerFactory.getLogger(MessageServiceImpl.class);
+    private final SimpMessagingTemplate simpMessagingTemplate;
+    private final MessageRepository messageRepository;
+    private final UserClient userClient;
+    private final WorkspaceClient workspaceClient;
+    private final RedisTemplate<String, Message> redisTemplate;
 
 
+    public MessageDTO messageDTOMapper(Message message) {
+        MessageDTO messageDTO = new MessageDTO();
+        messageDTO.setId(message.getId());
+        messageDTO.setContent(message.getContent());
+        messageDTO.setSender(userClient.getUserById(message.getSenderId()));
 
-  @Override
-  public void sendMessage(Message message) {
-    message.setSentAt(new Date());
-    for(UUID receiverId : message.getReceiverIds()){
-      redisTemplate.convertAndSend("/topic/messages", message);
-      redisTemplate.opsForList().rightPush("user:" + receiverId + ":messages", message);
+        messageDTO.setReceivers(new ArrayList<>());
+        for (UUID receiverId : message.getReceiverIds()) {
+            messageDTO.getReceivers().add(userClient.getUserById(receiverId));
+        }
+
+        if (message.getWorkspaceId() != null) {
+            messageDTO.setWorkspace(workspaceClient.getWorkspaceById(message.getWorkspaceId()));
+        }
+        messageDTO.setAttachment(message.getAttachment());
+        messageDTO.setStatus(message.getStatus());
+        messageDTO.setCreatedAt(message.getCreatedAt());
+        return messageDTO;
     }
-    messageRepository.save(message);
-  }
 
-
-
-  @Override
-  public void sendMessageToWorkspace(Message message) {
-    message.setSentAt(new Date());
-    redisTemplate.convertAndSend("/topic/messages/ " + message.getWorkspaceId(), message);
-    redisTemplate.opsForList().rightPush("workspace:" + message.getWorkspaceId() + ":messages", message);
-    messageRepository.save(message);
-  }
-
-
-
-  @Override
-  public List<Message> getMessagesForWorkspace(UUID workspaceId) {
-    List<Object> messages = redisTemplate.opsForList().range("workspace:" + workspaceId + ":messages", 0, -1);
-    if(messages == null){
-      return new ArrayList<>();
+    @Override
+    public MessageDTO sendMessage(Message message) {
+        message.setSentAt(new Date());
+        for (UUID receiverId : message.getReceiverIds()) {
+            redisTemplate.convertAndSend("/topic/messages", message);
+            redisTemplate.opsForList().rightPush("user:" + receiverId + ":messages", message);
+        }
+        messageRepository.save(message);
+        return messageDTOMapper(message);
     }
-//    if(messages.isEmpty()){
-//      messages = messageRepository.findAllByWorkspaceId(workspaceId);
-//      for(Message message : messages){
-//        redisTemplate.opsForList().rightPush("workspace:" + workspaceId + ":messages", message);
-//      }
-//    }
-//    return messages;
-      return null;
-  }
+
+
+    @Override
+    public MessageDTO sendMessageToWorkspace(Message message) {
+        message.setSentAt(new Date());
+        redisTemplate.convertAndSend("/topic/messages/ " + message.getWorkspaceId(), message);
+        redisTemplate.opsForList().rightPush("workspace:" + message.getWorkspaceId() + ":messages", message);
+        messageRepository.save(message);
+        return messageDTOMapper(message);
+    }
+
+
+    @Override
+    public List<MessageDTO> getMessagesForWorkspace(UUID workspaceId) {
+        List<Message> messages = redisTemplate.opsForList().range("workspace:" + workspaceId + ":messages", 0, -1);
+        if (messages == null) {
+            return new ArrayList<>();
+        }
+        if (messages.isEmpty()) {
+            messages = messageRepository.findAllByWorkspaceId(workspaceId);
+            for (Message message : messages) {
+                redisTemplate.opsForList().rightPush("workspace:" + workspaceId + ":messages", message);
+            }
+        }
+        List<MessageDTO> messageDTOS = new ArrayList<>();
+        for (Message message : messages) {
+            messageDTOS.add(messageDTOMapper(message));
+        }
+        return messageDTOS;
+    }
+
+    @Override
+    public List<MessageDTO> getMessagesForUser(UUID userId) {
+        List<Message> messages = redisTemplate.opsForList().range("user:" + userId + ":messages", 0, -1);
+        if (messages == null) {
+            return new ArrayList<>();
+        }
+        if (messages.isEmpty()) {
+            messages = messageRepository.findAllByReceiverIdsContains(userId);
+            for (Message message : messages) {
+                redisTemplate.opsForList().rightPush("user:" + userId + ":messages", message);
+            }
+        }
+        List<MessageDTO> messageDTOS = new ArrayList<>();
+        for (Message message : messages) {
+            messageDTOS.add(messageDTOMapper(message));
+        }
+        return messageDTOS;
+    }
 
 
 }

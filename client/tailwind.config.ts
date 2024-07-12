@@ -18,6 +18,9 @@ const config = {
       },
     },
     extend: {
+      fontSize : {
+        '2xs' : '0.65rem'
+      },
       fontFamily: {
         display: "Playfair Display",
         primary: "Jost",

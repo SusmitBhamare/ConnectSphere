@@ -1,15 +1,15 @@
 "use client"
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import Cookie from "js-cookie";
 import useUserStore from "@/app/zustand/store";
 
 
-function Home({ token }: { token: string | undefined }) {
+function Home() {
+  const token = useUserStore((state) => state.token);
   const router = useRouter();
   const logoutHandler = () => {
     axios
@@ -20,7 +20,7 @@ function Home({ token }: { token: string | undefined }) {
       })
       .then((res) => {
         useUserStore.getState().setToken(null);
-        router.push("/login");
+        router.push("/login") ;
         toast.success("Logged out successfully");
       })
       .catch((e) => {
@@ -28,9 +28,10 @@ function Home({ token }: { token: string | undefined }) {
       });
         
   };
-  return (
-    <>
-      {!token ? (
+  
+
+  return (  
+      !token ? (
         <div className="flex flex-col md:flex-row gap-2">
           <Button asChild>
             <Link className="" href={"/login"}>
@@ -43,8 +44,7 @@ function Home({ token }: { token: string | undefined }) {
         </div>
       ) : (
         <Button onClick={logoutHandler}>Logout</Button>
-      )}
-    </>
+      )
   );
 }
 
