@@ -14,10 +14,7 @@ import com.gather.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -78,10 +75,23 @@ public class UserServiceImpl implements UserService {
     return userToUserAllDetailsDTO(user);
   }
 
-  private UserAllDetailsDTO userToUserAllDetailsDTO(User user){
-    if(user == null){
+  public UserAllDetailsDTO userToUserAllDetailsDTO(User user) {
+    return userToUserAllDetailsDTO(user, new HashSet<>());
+  }
+
+  // Modified userToUserAllDetailsDTO method to include processedUsers parameter
+  private UserAllDetailsDTO userToUserAllDetailsDTO(User user, Set<UUID> processedUsers) {
+    if (user == null) {
       return null;
     }
+
+    if (processedUsers.contains(user.getId())) {
+      return null;
+    }
+
+
+    processedUsers.add(user.getId());
+
     UserAllDetailsDTO userAllDetailsDTO = new UserAllDetailsDTO();
     userAllDetailsDTO.setId(user.getId());
     userAllDetailsDTO.setName(user.getName());
@@ -90,11 +100,18 @@ public class UserServiceImpl implements UserService {
     userAllDetailsDTO.setRole(user.getRole());
     userAllDetailsDTO.setUsername(user.getUsername());
     userAllDetailsDTO.setWorkspaces(new ArrayList<>());
-    for(UUID workspaceId : user.getWorkspaces()){
+    for (UUID workspaceId : user.getWorkspaces()) {
       userAllDetailsDTO.getWorkspaces().add(workspaceClient.getWorkspaceById(workspaceId));
     }
+    userAllDetailsDTO.setUsersInteractedWith(new ArrayList<>());
+    for (UUID userId : user.getUsersInteractedWith()) {
+      User interactedUser = userRepository.findById(userId).orElse(null);
+      UserAllDetailsDTO interactedUserDTO = userToUserAllDetailsDTO(interactedUser, processedUsers);
+      if (interactedUserDTO != null && !userAllDetailsDTO.getUsersInteractedWith().contains(interactedUserDTO)) {
+        userAllDetailsDTO.getUsersInteractedWith().add(interactedUserDTO);
+      }
+    }
     userAllDetailsDTO.setMessagesReceived(new ArrayList<>());
-    // To add messages via message client
     userAllDetailsDTO.setMessagesSent(new ArrayList<>());
 
     return userAllDetailsDTO;
@@ -123,6 +140,27 @@ public class UserServiceImpl implements UserService {
       }
       userRepository.save(user);
     }
+  }
+
+  @Override
+  public void addUsersInteracted(UUID userId, UUID receiverId) {
+    User user = userRepository.findById(userId).orElse(null);
+    if(user == null){
+      throw new IllegalArgumentException("User not found");
+    }
+    Collection<UUID> usersInteracted = user.getUsersInteractedWith();
+    usersInteracted.add(receiverId);
+    user.setUsersInteractedWith(usersInteracted);
+    userRepository.save(user);
+
+    User user2 = userRepository.findById(receiverId).orElse(null);
+    if(user2 == null){
+      throw new IllegalArgumentException("User not found");
+    }
+    Collection<UUID> usersInteracted2 = user2.getUsersInteractedWith();
+    usersInteracted2.add(userId);
+    user2.setUsersInteractedWith(usersInteracted2);
+    userRepository.save(user2);
   }
 
 }

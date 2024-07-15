@@ -11,6 +11,7 @@ export interface User {
   messagesReceived: any[];
   workspaces: any[];
   enabled: boolean;
+  usersInteractedWith : User[];
   authorities: { authority: string }[];
   credentialsNonExpired: boolean;
   accountNonExpired: boolean;

@@ -2,6 +2,7 @@ package com.gather.user.dto;
 
 import com.gather.user.dummy.Workspace;
 import com.gather.user.entity.Role;
+import com.gather.user.entity.User;
 import lombok.Data;
 
 import java.util.Collection;
@@ -18,4 +19,5 @@ public class UserAllDetailsDTO {
     private Collection<UUID> messagesSent;
     private Collection<UUID> messagesReceived;
     private Collection<Workspace> workspaces;
+    private Collection<UserAllDetailsDTO> usersInteractedWith;
 }

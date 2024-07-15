@@ -4,9 +4,10 @@ import Sidebar from "@/components/custom/Sidebar";
 import React, { useEffect, useState } from "react";
 import { Workspace } from "../types/Workspace";
 import useUserStore from "../zustand/store";
+import { User } from "../types/User";
 
 const ChatPage = () => {
-  const [selectedChat, setSelectedChat] = useState<Workspace | null>(null);
+  const [selectedChat, setSelectedChat] = useState<Workspace | User | null>(null);
   const { user } = useUserStore();
   useEffect(() => {
     if(typeof window !== "undefined"){
@@ -14,6 +15,11 @@ const ChatPage = () => {
       const workspaceId = queryParams.get("workspace");
       if(workspaceId){
         setSelectedChat((prev) => prev = user?.workspaces.find((workspace) => workspace.id === workspaceId) || null);
+      }
+
+      const userId = queryParams.get("user");
+      if(userId){
+        setSelectedChat((prev) => prev = user?.usersInteractedWith.find((user) => user.id === userId) || null);
       }
     }
   } , [window]);

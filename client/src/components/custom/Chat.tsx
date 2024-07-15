@@ -20,13 +20,14 @@ import { Message, MessageResponse, Status } from "@/app/types/Message";
 import { ScrollArea } from "../ui/scroll-area";
 import { getMessagesForWorkspace } from "@/app/chat/workspaceClient";
 import MessageBubble from "./MessageBubble";
+import { User } from "@/app/types/User";
 
 function Chat({
   className,
   selectedChat,
 }: {
   className?: string;
-  selectedChat: Workspace | null;
+  selectedChat: Workspace | User | null;
 }) {
   const [stompClient, setStompClient] = useState<CompatClient | null>(null);
   const [messageInput, setMessageInput] = useState<string>("");
@@ -36,7 +37,6 @@ function Chat({
   const { fetchUser, user } = useUserStore();
 
   useEffect(() => {
-    
     const fetchMessages = async () => {
       if (!selectedChat) return;
       const messages = await getMessagesForWorkspace(selectedChat.id, cookie);
@@ -99,13 +99,17 @@ function Chat({
     };
   }, [stompClient, selectedChat, cookie]);
 
+  const isWorkspace = (chat: any): chat is Workspace => {
+    return (chat as Workspace).members !== undefined;
+  };
+
   const sendMessage = () => {
     if (messageInput.trim() !== "" && stompClient && user && selectedChat) {
       const message: Message = {
         content: messageInput,
-        receiverIds: selectedChat.members,
+        receiverIds: isWorkspace(selectedChat) ? selectedChat.members : [selectedChat.id],
         senderId: user.id,
-        workspaceId: selectedChat.id,
+        workspaceId: isWorkspace(selectedChat) ? selectedChat.id : "",
         attachment: "",
         createdAt: new Date(),
         status: Status.SENT,
@@ -131,14 +135,20 @@ function Chat({
             <Avatar className="rounded-full ring ring-primary/50">
               <AvatarImage
                 className="rounded-full h-16 w-16"
-                src={selectedChat.image}
+                src={selectedChat.image ? selectedChat.image : ""}
                 alt={selectedChat.name} // Assuming selectedChat has 'image' and 'name' properties
               />
               <AvatarFallback>
                 {selectedChat.name.toLocaleUpperCase()[0]}
               </AvatarFallback>
             </Avatar>
-            <WorkspaceMember workspace={selectedChat} />
+            {isWorkspace(selectedChat) ? (
+              <WorkspaceMember workspace={selectedChat} />
+            ) : (
+              <h1 className="font-primary text-lg cursor-pointer">
+                {selectedChat?.name}
+              </h1>
+            )}
           </div>
           {loading ? (
             <div className="text-center mt-32 text-muted-foreground">
@@ -150,9 +160,13 @@ function Chat({
               className="h-[29rem] rounded-md overflow-y-auto"
             >
               <div className="flex flex-col px-4">
-              {messages.map((message, index) => (
-                <MessageBubble message={message} key={index} isUser={user?.username === message.sender.username}/ >
-              ))}
+                {messages.map((message, index) => (
+                  <MessageBubble
+                    message={message}
+                    key={index}
+                    isUser={user?.username === message.sender.username}
+                  />
+                ))}
               </div>
             </ScrollArea>
           )}

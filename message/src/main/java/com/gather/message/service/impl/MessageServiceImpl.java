@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.gather.message.client.UserClient;
 import com.gather.message.client.WorkspaceClient;
+import com.gather.message.dummy.AddUsersInteractedDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -54,6 +55,9 @@ public class MessageServiceImpl implements MessageService {
     public MessageDTO sendMessage(Message message) {
         message.setSentAt(new Date());
         for (UUID receiverId : message.getReceiverIds()) {
+            AddUsersInteractedDTO addUsersInteractedDTO = new AddUsersInteractedDTO(receiverId);
+            System.out.println("addUsersInteractedDTO: " + addUsersInteractedDTO);
+            userClient.addUsersInteracted(message.getSenderId(), addUsersInteractedDTO);
             redisTemplate.convertAndSend("/topic/messages", message);
             redisTemplate.opsForList().rightPush("user:" + receiverId + ":messages", message);
         }

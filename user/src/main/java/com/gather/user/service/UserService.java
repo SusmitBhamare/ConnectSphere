@@ -23,5 +23,6 @@ public interface UserService {
 
   void removeUserFromWorkspace(UUID userId, UUID workspaceId);
 
+  void addUsersInteracted(UUID userId, UUID receiverId);
 }
 

@@ -45,6 +45,7 @@ import { FaTrash } from "react-icons/fa6";
 import { createWorkspace } from "@/app/chat/workspaceClient";
 import { User } from "@/app/types/User";
 import useUserStore from "@/app/zustand/store";
+import { toast } from "sonner";
 
 
 function WorkspaceModel({ setWorkspaceCreated }: { setWorkspaceCreated : (value : boolean) => void}) {
@@ -93,7 +94,10 @@ function WorkspaceModel({ setWorkspaceCreated }: { setWorkspaceCreated : (value 
 
   const createWorkspaceHandler: SubmitHandler<WorkspaceSchema> = async (data) => {
     const userIds = selectedUsers.reduce((acc , user) => {acc.push(user.id); return acc} , [] as string[]);
-
+      if(userIds.length === 0){
+        toast.error("Please add atleast one user to the workspace");
+        return;
+      }
       if(await createWorkspace({ ...data, members: userIds } ,cookie ? cookie : "")){
         form.reset({
           name: "",

@@ -1,6 +1,7 @@
 package com.gather.user.controller;
 
 
+import com.gather.user.dto.AddUsersInteractedDTO;
 import com.gather.user.dto.UserAllDetailsDTO;
 import com.gather.user.entity.User;
 import com.gather.user.service.UserService;
@@ -81,6 +82,16 @@ public class UtilController {
         try{
             userService.removeUserFromWorkspace(userId, workspaceId);
             return ResponseEntity.ok("Workspace updated");
+        } catch(IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/user/usersInteracted/{userId}")
+    public ResponseEntity<String> addUsersInteracted(@PathVariable UUID userId, @RequestBody AddUsersInteractedDTO receiverId) {
+        try{
+            userService.addUsersInteracted(userId, receiverId.getReceiverId());
+            return ResponseEntity.ok("Users updated");
         } catch(IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }

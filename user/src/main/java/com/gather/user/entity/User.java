@@ -36,6 +36,9 @@ public class User implements UserDetails {
   private Collection<UUID> messagesSent;
 
   @ElementCollection(targetClass = UUID.class)
+  private Collection<UUID> usersInteractedWith;
+
+  @ElementCollection(targetClass = UUID.class)
   private Collection<UUID> messagesReceived;
 
   @ElementCollection(targetClass = UUID.class)

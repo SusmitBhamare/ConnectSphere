@@ -57,7 +57,7 @@ export async function removeMember(workspaceId: string, memberId: string, token:
 
 export async function addMembers(workspaceId: string | undefined, members: string[], token: string | undefined | null) {
   try {
-    const response = await axios.put(workspaceUrl + "/workspace/add/" + workspaceId, { userIds : members }, {
+    const response = await axios.put(workspaceUrl + "/workspace/add/" + workspaceId, { userIds: members }, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -82,17 +82,30 @@ export async function deleteWorkspace(workspaceId: string, token: string | undef
 }
 
 
-export async function getMessagesForWorkspace(workspaceId : string, token : string | undefined | null){
+export async function getMessagesForWorkspace(workspaceId: string, token: string | undefined | null) {
 
-  try{
-    const response = await axios.get(messageUrl + "/messages/workspace/" + workspaceId , {
-      headers : {
-        'Authorization' : `Bearer ${token}`
+  try {
+    const response = await axios.get(messageUrl + "/messages/workspace/" + workspaceId, {
+      headers: {
+        'Authorization': `Bearer ${token}`
       }
     });
     return response.data;
-  } catch(e){
+  } catch (e) {
     return null;
   }
 
+}
+
+export async function getMessagesForUser(userId: string, token: string | undefined | null) {
+  try {
+    const response = await axios.get(messageUrl + "/messages/user/" + userId, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    return response.data;
+  } catch (e) {
+    return null;
+  }
 }

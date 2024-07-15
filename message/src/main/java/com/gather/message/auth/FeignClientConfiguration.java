@@ -48,23 +48,4 @@ public class FeignClientConfiguration {
         };
     }
 
-    @Bean
-    public feign.Logger.Level feignLoggerLevel() {
-        return feign.Logger.Level.FULL;
-    }
-
-    @Bean
-    public Decoder feignDecoder() {
-        return new JacksonDecoder();
-    }
-
-    @Bean
-    public Encoder feignEncoder() {
-        return new JacksonEncoder();
-    }
-
-    @Bean
-    public ErrorDecoder errorDecoder() {
-        return new ErrorDecoder.Default();
-    }
 }

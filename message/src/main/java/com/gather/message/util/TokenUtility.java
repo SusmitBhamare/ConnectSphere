@@ -26,10 +26,6 @@ public class TokenUtility {
         }
         String token = authorization.substring(7);
         setToken(token);
-        if(storedToken.equals(token)){
-            log.info("Token present " + token);
-            return;
-        }
         log.info("Token not present so stored now " + token);
         setToken(token);
     }
