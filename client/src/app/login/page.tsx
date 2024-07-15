@@ -20,8 +20,10 @@ import "../globals.css";
 import login_image from "../../assets/images/login.jpg";
 import { generateQuote } from "../utils/randomQuoteGenerator";
 import { useRouter } from "next/navigation";
+import useUserStore from "../zustand/store";
 
 const Login = () => {
+  const {token , setOnlineMembers} = useUserStore();
   const [quote, setQuote] = useState<{ quote: string; author: string }>({
     quote: "",
     author: "",
@@ -40,6 +42,7 @@ const Login = () => {
       username: "",
       password: "",
     });
+    
     router.push("/chat");
   };
 

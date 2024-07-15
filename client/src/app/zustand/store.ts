@@ -2,12 +2,17 @@ import { create } from 'zustand';
 import axios from 'axios';
 import { User } from '../types/User';
 import { persist, createJSONStorage } from 'zustand/middleware'
+import WebSocketService from '../utils/socket';
 
 const url = "http://localhost:8081/util";
 
 
 interface UserStoreState {
   user: User | null;
+  onlineMembers : String[] | null | undefined;
+  stompClient : WebSocketService | null;
+  setStompClient: (stompClient: WebSocketService) => void;
+  setOnlineMembers: (onlineMembers: String[] | null | undefined) => void;
   isLoading: boolean;
   error: any; // Adjust type based on your error handling
   token: string | null;
@@ -33,12 +38,17 @@ async function getCurrentUser() {
   }
 }
 
+
 // Create a Zustand store
 const useUserStore = create<UserStoreState>()(
 
   persist((set) => ({
+    stompClient : null,
+    setStompClient: (stompClient : WebSocketService) => set({ stompClient }),
     user: null,
     isLoading: false,
+    onlineMembers : null,
+    setOnlineMembers: (onlineMembers) => set({ onlineMembers }),
     error: null,
     token: null,
     setToken: (token) => set({ token }),

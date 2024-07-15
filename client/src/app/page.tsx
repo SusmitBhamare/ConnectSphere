@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React from 'react'
 import { getToken, isLoggedIn } from './utils/jwtUtil';
+import WebSocketProvider from '@/components/custom/WebSocketProvider';
 
 function page() {
   axios.defaults.withCredentials = true;
@@ -8,6 +9,7 @@ function page() {
   if(isLoggedIn()){
     token = getToken()?.value;  
   }
+  
   return (
     <div>
     </div>

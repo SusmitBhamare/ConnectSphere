@@ -2,6 +2,7 @@ package com.gather.user.service.impl;
 
 import com.gather.user.entity.Role;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,6 +32,7 @@ public class AuthServiceImpl implements AuthService{
   private final JWTService jwtService;
   private final RedisService redisService;
 
+
   @Override
   public User register(UserRegisterDTO userRegisterDTO){
     User user = new User();
@@ -47,6 +49,7 @@ public class AuthServiceImpl implements AuthService{
     authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLoginDTO.getUsername(), userLoginDTO.getPassword()));
 
     User user = userRepository.findByUsername(userLoginDTO.getUsername()).orElseThrow(() -> new IllegalArgumentException("Invalid Credentials"));
+    userRepository.save(user);
     String token = jwtService.generateToken(user);
 
     Cookie tokenCookie = new Cookie("token" , token);
@@ -54,16 +57,18 @@ public class AuthServiceImpl implements AuthService{
     tokenCookie.setHttpOnly(false);
     tokenCookie.setMaxAge(10*60*60);
     response.addCookie(tokenCookie);
-
     UserLoginResponseDTO responseBody = new UserLoginResponseDTO();
     responseBody.setToken(token);
+    redisService.addToSet("connectedUsers", user.getUsername());
+
     return ResponseEntity.ok().header("Access-Control-Allow-Credentials", "true").body(responseBody);
   }
 
   @Override
-  public void logout(UserDetails user, HttpServletResponse response){
+  public void logout(UserDetails userDetails, HttpServletResponse response){
+    redisService.removeFromSet("connectedUsers", userDetails.getUsername());
+    redisService.deleteToken("token_" + userDetails.getUsername());
     response.setHeader("Set-Cookie", "token=; path=/; max-age=0; HttpOnly; SameSite=None; Secure");
-    redisService.deleteToken("token_" + user.getUsername());
   }
 
 }

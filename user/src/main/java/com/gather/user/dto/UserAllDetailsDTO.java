@@ -2,7 +2,6 @@ package com.gather.user.dto;
 
 import com.gather.user.dummy.Workspace;
 import com.gather.user.entity.Role;
-import jakarta.persistence.ElementCollection;
 import lombok.Data;
 
 import java.util.Collection;

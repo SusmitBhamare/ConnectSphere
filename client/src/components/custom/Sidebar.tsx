@@ -6,14 +6,14 @@ import WorkspaceModel from "./WorkspaceModel";
 import ChatSkeleton from "./ChatSkeleton";
 import useUserStore from "@/app/zustand/store";
 import { Workspace } from "@/app/types/Workspace";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { User } from "@/app/types/User";
 
 function Sidebar({
   selectedChat,
-  setSelectedChat
+  setSelectedChat,
 }: {
-  selectedChat: Workspace | null,
+  selectedChat: Workspace | null;
   setSelectedChat: (workspace: Workspace) => void;
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -21,25 +21,23 @@ function Sidebar({
   const [isActive, setisActive] = useState<string>("");
   const { fetchUser, user } = useUserStore();
   const [search, setSearch] = useState<string>("");
-  const [users , setUsers] = useState<User[]>([]);
-  const [searchUser , setSearchUser] = useState<string>("");
-  const router = useRouter();  
+  const router = useRouter();
 
-  const handleSelectChat = (workspaceId: String , workspace : Workspace) => {
+  const handleSelectChat = (workspaceId: String, workspace: Workspace) => {
+    console.log(workspaceId, workspace);
     setSelectedChat(workspace);
-    router.push("?workspace=" + workspaceId , {scroll : false});
+    router.push("?workspace=" + workspaceId, { scroll: false });
   };
-
   useEffect(() => {
-    if(selectedChat){
-      setisActive((prev) => prev = selectedChat.id);
+    if (selectedChat && selectedChat.id !== isActive) {
+      setisActive(selectedChat.id);
     }
-  } , [selectedChat])
+  }, [selectedChat, isActive]);
 
   useEffect(() => {
     fetchUser();
     setIsLoading(false);
-  }, [workspaceCreated, fetchUser]);
+  }, [workspaceCreated]);
 
   return (
     <div className="flex flex-col min-h-full w-full justify-between items-center  shadow-lg">
@@ -89,7 +87,10 @@ function Sidebar({
   }) {
     return (
       <div
-        onClick={() => handleSelectChat(workspace.id , workspace)}
+        onClick={() => {
+          console.log("clicked");
+          handleSelectChat(workspace.id, workspace);
+        }}
         className={`${
           isActive ? "bg-primary/30" : "bg-zinc-900"
         } h-max w-full flex flex-row items-center px-4 gap-3 py-2 cursor-pointer`}

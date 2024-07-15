@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/custom/theme-provider";
 import { Toaster } from "sonner";
 import Navbar from "@/components/custom/Navbar";
+import WebSocketProvider from "@/components/custom/WebSocketProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -19,11 +20,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-      <Navbar />
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {children}
-          <Toaster richColors theme="dark" />
-        </ThemeProvider>
+        <WebSocketProvider>
+          <Navbar />
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            {children}
+            <Toaster richColors theme="dark" />
+          </ThemeProvider>
+        </WebSocketProvider>
       </body>
     </html>
   );

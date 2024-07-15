@@ -4,6 +4,8 @@ import com.gather.message.dto.MessageDTO;
 import com.gather.message.entity.Message;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public interface MessageService {
@@ -15,4 +17,7 @@ public interface MessageService {
   List<MessageDTO> getMessagesForWorkspace(UUID workspaceId);
 
   List<MessageDTO> getMessagesForUser(UUID userId);
+
+  Map<String, Set<String>> getConnectedUsers();
+
 }

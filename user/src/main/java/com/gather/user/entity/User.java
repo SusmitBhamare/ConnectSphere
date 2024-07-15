@@ -31,6 +31,7 @@ public class User implements UserDetails {
   private String email;
   private String image;
   private Role role;
+
   @ElementCollection(targetClass = UUID.class)
   private Collection<UUID> messagesSent;
 

@@ -3,7 +3,6 @@ import Chat from "@/components/custom/Chat";
 import Sidebar from "@/components/custom/Sidebar";
 import React, { useEffect, useState } from "react";
 import { Workspace } from "../types/Workspace";
-import { StompSessionProvider } from "react-stomp-hooks";
 import useUserStore from "../zustand/store";
 
 const ChatPage = () => {
@@ -13,12 +12,11 @@ const ChatPage = () => {
     if(typeof window !== "undefined"){
       const queryParams = new URLSearchParams(window.location.search);
       const workspaceId = queryParams.get("workspace");
-      console.log(workspaceId);
       if(workspaceId){
         setSelectedChat((prev) => prev = user?.workspaces.find((workspace) => workspace.id === workspaceId) || null);
       }
     }
-  } , [typeof window !== "undefined" ? window : ""]);
+  } , [window]);
 
   return (
     <div className="max-w-screen h-[90vh] grid grid-cols-4 mt-16">

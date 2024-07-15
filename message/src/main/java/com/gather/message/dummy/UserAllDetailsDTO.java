@@ -19,5 +19,6 @@ public class UserAllDetailsDTO {
     private Collection<UUID> messagesSent;
     private Collection<UUID> messagesReceived;
     private Collection<Workspace> workspaces;
+    private boolean isOnline = false;
 
 }

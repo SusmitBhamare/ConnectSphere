@@ -36,6 +36,7 @@ function Chat({
   const { fetchUser, user } = useUserStore();
 
   useEffect(() => {
+    
     const fetchMessages = async () => {
       if (!selectedChat) return;
       const messages = await getMessagesForWorkspace(selectedChat.id, cookie);

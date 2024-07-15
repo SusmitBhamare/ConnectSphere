@@ -16,36 +16,44 @@ import com.gather.message.dto.MessageDTO;
 import com.gather.message.service.MessageService;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
-
 
 
 @RestController
 @AllArgsConstructor
 public class MessageController {
 
-  private final MessageService messageService;
+    private final MessageService messageService;
 
-  @MessageMapping("/chat")
-  @SendTo("/topic/messages")
-  public MessageDTO sendMessage(@RequestBody Message message , SimpMessageHeaderAccessor headerAccessor){
-    TokenUtility.storeToken(headerAccessor);
-    if(message.getWorkspaceId() != null){
-      return messageService.sendMessageToWorkspace(message);
-    } else{
-     return messageService.sendMessage(message);
+    @MessageMapping("/chat")
+    @SendTo("/topic/messages")
+    public MessageDTO sendMessage(@RequestBody Message message, SimpMessageHeaderAccessor headerAccessor) {
+        TokenUtility.storeToken(headerAccessor);
+        if (message.getWorkspaceId() != null) {
+            return messageService.sendMessageToWorkspace(message);
+        } else {
+            return messageService.sendMessage(message);
+        }
+
     }
 
-  }
+    @GetMapping("/messages/workspace/{workspaceId}")
+    public ResponseEntity<List<MessageDTO>> getMessagesForWorkspace(@PathVariable UUID workspaceId) {
+        return ResponseEntity.ok(messageService.getMessagesForWorkspace(workspaceId));
+    }
 
-  @GetMapping("/messages/workspace/{workspaceId}")
-  public ResponseEntity<List<MessageDTO>> getMessagesForWorkspace(@PathVariable UUID workspaceId){
-    return ResponseEntity.ok(messageService.getMessagesForWorkspace(workspaceId));
-  }
-
-  @GetMapping("/messages/user/{userId}")
-    public ResponseEntity<List<MessageDTO>> getMessagesForUser(@PathVariable UUID userId){
+    @GetMapping("/messages/user/{userId}")
+    public ResponseEntity<List<MessageDTO>> getMessagesForUser(@PathVariable UUID userId) {
         return ResponseEntity.ok(messageService.getMessagesForUser(userId));
     }
+
+    @MessageMapping("/users")
+    @SendTo("/topic/connectedUsers")
+    public Map<String, Set<String>> getConnectedUsers() {
+        return messageService.getConnectedUsers();
+    }
+
 
 }

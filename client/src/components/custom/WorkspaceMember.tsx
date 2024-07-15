@@ -29,8 +29,8 @@ const WorkspaceMember = ({
   const [open , setOpen] = useState<boolean>(false);
   const [members, setMembers] = useState<User[]>([]);
   const [mod, setMod] = useState<User | null>(null);
-  const { user, token, fetchUser } = useUserStore();
-
+  
+  const { user, token, fetchUser , onlineMembers } = useUserStore();
 
   useEffect(() => {
     fetchUser();
@@ -72,7 +72,7 @@ const WorkspaceMember = ({
         <DialogTitle>Workspace Members</DialogTitle>
         <Separator />
         <div className="flex flex-col gap-2">
-          <div className="flex gap-4 items-center mb-2">
+          <div className="flex gap-4 relative items-center mb-2">
             <Avatar className="rounded-full ring ring-primary/50">
               <AvatarImage
                 className="rounded-full h-16 w-16"
@@ -81,6 +81,13 @@ const WorkspaceMember = ({
               />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
+            <div
+              className={`absolute bottom-0 left-0 w-2 border-0.5 border-primary h-2 rounded-full ${
+                onlineMembers?.includes(mod ? mod?.username : "")
+                  ? "bg-green-600"
+                  : "bg-red-600"
+              }`}
+            ></div>
 
             <div className="w-full">
               <div className="flex w-full justify-between text-sm items-center">
@@ -93,7 +100,7 @@ const WorkspaceMember = ({
           {members &&
             members.map((member) => (
               <div className="flex gap-2 justify-between items-center">
-                <div className="flex gap-4 items-center">
+                <div className="flex gap-4 relative items-center">
                   <Avatar className="rounded-full ring ring-primary/50">
                     <AvatarImage
                       className="rounded-full h-6 w-6"
@@ -102,6 +109,13 @@ const WorkspaceMember = ({
                     />
                     <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
+                  <div
+                    className={`absolute bottom-0 left-0 w-2 border-0.5 border-primary h-2 rounded-full ${
+                      onlineMembers?.includes(member.username)
+                        ? "bg-green-600"
+                        : "bg-red-600"
+                    }`}
+                  ></div>
                   <div>
                     <h1 className="text-sm">{member.name}</h1>
                     <p className="text-xs text-muted-foreground">
@@ -110,24 +124,34 @@ const WorkspaceMember = ({
                   </div>
                 </div>
                 {user?.role === "MOD" && member.username !== user.username && (
-                  <Button size={"icon"} onClick={()=>removeMemberHandler(member.id)} variant={"destructive"}>
+                  <Button
+                    size={"icon"}
+                    onClick={() => removeMemberHandler(member.id)}
+                    variant={"destructive"}
+                  >
                     <FaTrash />
                   </Button>
                 )}
               </div>
             ))}
         </div>
-        {
-          user && user.role === "MOD" && (
-            <div>
-            <Separator/>
-        <DialogFooter className="w-full flex items-center">
-          <AddMemberToWorkspace workspaceId={workspace?.id} setMembers={setMembers} members={members}/>
-          <DeleteWorkspace workspace={workspace} open={open} setOpen={setOpen}/>
-        </DialogFooter>
-            </div>
-          )
-        }
+        {user && user.role === "MOD" && (
+          <div>
+            <Separator />
+            <DialogFooter className="w-full flex items-center">
+              <AddMemberToWorkspace
+                workspaceId={workspace?.id}
+                setMembers={setMembers}
+                members={members}
+              />
+              <DeleteWorkspace
+                workspace={workspace}
+                open={open}
+                setOpen={setOpen}
+              />
+            </DialogFooter>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

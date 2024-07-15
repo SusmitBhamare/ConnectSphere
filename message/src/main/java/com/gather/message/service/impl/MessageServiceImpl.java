@@ -1,9 +1,6 @@
 package com.gather.message.service.impl;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import com.gather.message.client.UserClient;
 import com.gather.message.client.WorkspaceClient;
@@ -15,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import com.gather.message.dto.MessageDTO;
 import com.gather.message.entity.Message;
-import com.gather.message.entity.Status;
 import com.gather.message.repository.MessageRepository;
 import com.gather.message.service.MessageService;
 
@@ -31,6 +27,7 @@ public class MessageServiceImpl implements MessageService {
     private final UserClient userClient;
     private final WorkspaceClient workspaceClient;
     private final RedisTemplate<String, Message> redisTemplate;
+    private final RedisTemplate<String, String> stringRedisTemplate;
 
 
     public MessageDTO messageDTOMapper(Message message) {
@@ -111,6 +108,14 @@ public class MessageServiceImpl implements MessageService {
             messageDTOS.add(messageDTOMapper(message));
         }
         return messageDTOS;
+    }
+
+    @Override
+    public Map<String, Set<String>> getConnectedUsers() {
+        Set<String> connectedUsers = stringRedisTemplate.opsForSet().members("connectedUsers");
+        HashMap<String , Set<String>> map = new HashMap<>();
+        map.put("connectedUsers", connectedUsers);
+        return map;
     }
 
 

@@ -25,4 +25,13 @@ public class RedisService {
     public boolean isTokenPresent(String key){
         return Boolean.TRUE.equals(redisTemplate.hasKey(key));
     }
+
+    public void addToSet(String key , String value){
+        redisTemplate.opsForSet().add(key, value);
+    }
+
+    public void removeFromSet(String key , String value){
+        redisTemplate.opsForSet().remove(key, value);
+    }
+
 }
