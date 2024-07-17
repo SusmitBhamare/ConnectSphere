@@ -65,7 +65,7 @@ function Sidebar({
   useEffect(() => {
     fetchUser();
     setIsLoading(false);
-  }, [workspaceCreated]);
+  }, [ , workspaceCreated]);
 
   return (
     <div className="flex flex-col min-h-full w-full justify-between items-center  shadow-lg">
@@ -77,8 +77,9 @@ function Sidebar({
           className="my-2 rounded-full"
           placeholder="Search for users or workspaces"
         />
-        {searchedUser && <UserChat user={searchedUser} isActive={false} />}
-
+        {searchedUser && (
+          <UserChat user={searchedUser} isActive={isActive === searchedUser.id} />
+        )}
 
         {user?.usersInteractedWith.map((user) => {
           return <UserChat user={user} isActive={isActive === user.id} />;

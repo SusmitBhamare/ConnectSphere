@@ -1,5 +1,6 @@
 package com.gather.message.controller;
 
+import com.gather.message.dto.MessageWithAttachmentDTO;
 import com.gather.message.entity.Message;
 import com.gather.message.util.TokenUtility;
 import lombok.AllArgsConstructor;
@@ -29,7 +30,7 @@ public class MessageController {
 
     @MessageMapping("/chat")
     @SendTo("/topic/messages")
-    public MessageDTO sendMessage(@RequestBody Message message, SimpMessageHeaderAccessor headerAccessor) {
+    public MessageDTO sendMessage(@RequestBody MessageWithAttachmentDTO message, SimpMessageHeaderAccessor headerAccessor) {
         TokenUtility.storeToken(headerAccessor);
         if (message.getWorkspaceId() != null) {
             return messageService.sendMessageToWorkspace(message);
@@ -44,9 +45,9 @@ public class MessageController {
         return ResponseEntity.ok(messageService.getMessagesForWorkspace(workspaceId));
     }
 
-    @GetMapping("/messages/user/{userId}")
-    public ResponseEntity<List<MessageDTO>> getMessagesForUser(@PathVariable UUID userId) {
-        return ResponseEntity.ok(messageService.getMessagesForUser(userId));
+    @GetMapping("/messages/user/{userOneId}/{userTwoId}")
+    public ResponseEntity<List<MessageDTO>> getMessagesForConversation(@PathVariable UUID userOneId, @PathVariable UUID userTwoId) {
+        return ResponseEntity.ok(messageService.getMessagesForConversation(userOneId , userTwoId));
     }
 
     @MessageMapping("/users")

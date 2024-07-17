@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { RiSendPlaneFill } from "react-icons/ri";
-import { MdAttachment } from "react-icons/md";
 import {
   Tooltip,
   TooltipContent,
@@ -18,9 +17,15 @@ import SockJS from "sockjs-client";
 import { CompatClient, Stomp } from "@stomp/stompjs";
 import { Message, MessageResponse, Status } from "@/app/types/Message";
 import { ScrollArea } from "../ui/scroll-area";
-import { getMessagesForWorkspace } from "@/app/chat/workspaceClient";
+import {
+  getMessagesForUser,
+  getMessagesForWorkspace,
+} from "@/app/chat/workspaceClient";
 import MessageBubble from "./MessageBubble";
 import { User } from "@/app/types/User";
+import AttachmentModal from "./AttachmentModal";
+import { Badge } from "../ui/badge";
+import { MdClose } from "react-icons/md";
 
 function Chat({
   className,
@@ -31,15 +36,25 @@ function Chat({
 }) {
   const [stompClient, setStompClient] = useState<CompatClient | null>(null);
   const [messageInput, setMessageInput] = useState<string>("");
+  const [attachment, setAttachment] = useState<File | null>(null);
   const [messages, setMessages] = useState<MessageResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const cookie = useUserStore((state) => state.token); // Assuming this fetches the token correctly
   const { fetchUser, user } = useUserStore();
 
   useEffect(() => {
+    console.log("Selected chat: ", selectedChat);
     const fetchMessages = async () => {
       if (!selectedChat) return;
-      const messages = await getMessagesForWorkspace(selectedChat.id, cookie);
+      let messages;
+      if (isWorkspace(selectedChat)) {
+        messages = await getMessagesForWorkspace(selectedChat.id, cookie);
+      } else {
+        // Assuming this function fetches messages for a user
+        if (user) {
+          messages = await getMessagesForUser(user.id, selectedChat.id, cookie);
+        }
+      }
       if (messages) {
         setMessages(messages);
       }
@@ -104,16 +119,24 @@ function Chat({
   };
 
   const sendMessage = () => {
-    if (messageInput.trim() !== "" && stompClient && user && selectedChat) {
+    if (
+      (messageInput.trim() !== "" || attachment) &&
+      stompClient &&
+      user &&
+      selectedChat
+    ) {
       const message: Message = {
         content: messageInput,
-        receiverIds: isWorkspace(selectedChat) ? selectedChat.members : [selectedChat.id],
+        receiverIds: isWorkspace(selectedChat)
+          ? selectedChat.members
+          : [selectedChat.id],
         senderId: user.id,
         workspaceId: isWorkspace(selectedChat) ? selectedChat.id : "",
-        attachment: "",
+        attachment: attachment,
         createdAt: new Date(),
         status: Status.SENT,
       };
+      
 
       stompClient.send(
         "/app/chat", // Destination
@@ -124,6 +147,7 @@ function Chat({
       );
 
       setMessageInput(""); // Clear input after sending message
+      fetchUser(); // Fetching latest user interactions after sending message
     }
   };
 
@@ -171,24 +195,32 @@ function Chat({
             </ScrollArea>
           )}
           <div className="absolute w-full bottom-0">
-            <div className="flex items-center justify-between px-4 py-2   rounded-b-lg">
-              <Input
-                type="text"
-                placeholder="Send a message"
-                value={messageInput}
-                onChange={(e) => setMessageInput(e.target.value)}
-              />
-              <div className="flex gap-2">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="secondary">
-                        <MdAttachment />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Attach files</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+            <div className="flex items-center justify-between px-4 py-2 rounded-b-lg">
+              <div className="relative w-full">
+                <Input
+                  type="text"
+                  placeholder="Send a message"
+                  value={messageInput}
+                  onChange={(e) => setMessageInput(e.target.value)}
+                  className={`relative ${attachment ? "h-12" : ""}`}
+                />
+                {attachment && (
+                  <div className="absolute top-1/2 right-3 transform -translate-y-1/2 ">
+                    <Badge
+                      variant={"secondary"}
+                      className="text-sm md:text-base flex gap-2 items-center "
+                    >
+                      {attachment?.name}{" "}
+                      <MdClose
+                        onClick={() => setAttachment(null)}
+                        className="cursor-pointer"
+                      />
+                    </Badge>
+                  </div>
+                )}
+              </div>
+              <div className="flex gap-2 items-center px-3">
+                <AttachmentModal setAttachment={setAttachment} />
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -205,7 +237,7 @@ function Chat({
         </div>
       ) : (
         <div className="text-center mt-32 text-muted-foreground">
-          <h1 className="text-2xl">Select a chat to start messaging</h1>
+          <h1 className="text-3xl">Select a chat to start messaging</h1>
         </div>
       )}
     </div>

@@ -13,10 +13,11 @@ export interface Message {
   status : Status | undefined
   senderId: string | undefined,
   workspaceId: string | undefined,
-  attachment: string | undefined,
+  attachment: File | null,
   createdAt : Date | undefined
   sentAt? : Date
 }
+
 
 export interface MessageResponse {
   id : string,

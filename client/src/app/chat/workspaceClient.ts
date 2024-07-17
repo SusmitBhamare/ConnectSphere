@@ -97,9 +97,9 @@ export async function getMessagesForWorkspace(workspaceId: string, token: string
 
 }
 
-export async function getMessagesForUser(userId: string, token: string | undefined | null) {
+export async function getMessagesForUser(senderId : string, receiverId: string, token: string | undefined | null) {
   try {
-    const response = await axios.get(messageUrl + "/messages/user/" + userId, {
+    const response = await axios.get(messageUrl + "/messages/user/" + senderId + "/" + receiverId, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
