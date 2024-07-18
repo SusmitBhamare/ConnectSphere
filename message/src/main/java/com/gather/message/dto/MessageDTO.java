@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import com.gather.message.dummy.UserAllDetailsDTO;
 import com.gather.message.dummy.Workspace;
+import com.gather.message.entity.Attachment;
 import com.gather.message.entity.Status;
 import lombok.Data;
 
@@ -16,7 +17,7 @@ public class MessageDTO {
   private String content;
   private UserAllDetailsDTO sender;
   private Workspace workspace;
-  private String attachment;
+  private Attachment attachment;
   private Date createdAt;
   private Date sentAt;
   private Status status;

@@ -13,11 +13,19 @@ export interface Message {
   status : Status | undefined
   senderId: string | undefined,
   workspaceId: string | undefined,
-  attachment: File | null,
+  attachment: Attachment | null,
   createdAt : Date | undefined
   sentAt? : Date
 }
 
+
+export interface Attachment{
+  url : string,
+  name : string,
+  type : string,
+  size : number
+  extension : string
+}
 
 export interface MessageResponse {
   id : string,
@@ -26,7 +34,7 @@ export interface MessageResponse {
   status: string ,
   sender: User,
   workspaceId: Workspace | undefined,
-  attachment: string | undefined,
+  attachment: Attachment | undefined,
   createdAt: Date | undefined
   sentAt?: Date
 }

@@ -1,43 +1,56 @@
-"use client";
-
+"use client"
 import WebSocketService from "@/app/utils/socket";
 import useUserStore from "@/app/zustand/store";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 
-const WebSocketProvider = ({children} : {children : ReactNode}) => {
+const WebSocketProvider = ({ children }: { children: ReactNode }) => {
   const token = useUserStore((state) => state.token);
-  useEffect(() => {
-    let interval: string | number | NodeJS.Timeout | undefined;
-    if (token) {
-      const connect = async () => {
-        const stompClient = new WebSocketService();
-        stompClient.connect(token);
+  const stompClientRef = useRef<WebSocketService | null>(null);
 
-        stompClient.onConnected(() => {
-          stompClient.send("/app/users", "");
+  useEffect(() => {
+    // Clean up previous connection when token changes or component unmounts
+    if (stompClientRef.current) {
+      stompClientRef.current.disconnect();
+      stompClientRef.current = null;
+    }
+
+    if (token) {
+      // Create a new WebSocket connection
+      const stompClient = new WebSocketService();
+      stompClient.connect(token);
+      stompClientRef.current = stompClient;
+
+      // Handle connection events
+      stompClient.onConnected(() => {
+        // Function to fetch latest subscription data (connected users)
+        const fetchLatestData = () => {
+          stompClient.send("/app/users", ""); // Replace with your actual endpoint
           stompClient.subscribe("/topic/connectedUsers", (message) => {
             useUserStore
               .getState()
               .setOnlineMembers(JSON.parse(message.body).connectedUsers);
           });
-        });
-      };
+        };
 
-      connect();
-      interval = setInterval(connect, 5000);
+        // Initial fetch
+        fetchLatestData();
+
+        // Set up interval to fetch data every 15 seconds
+        const intervalId = setInterval(fetchLatestData, 15000);
+
+        // Clean up interval and WebSocket connection when component unmounts or token changes
+        return () => {
+          clearInterval(intervalId);
+          if (stompClientRef.current) {
+            stompClientRef.current.disconnect();
+            stompClientRef.current = null;
+          }
+        };
+      });
     }
-
-    // Clean up interval when component unmounts or token changes
-    return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
-    };
   }, [token]);
 
-  return <div>
-    {children}
-  </div>
+  return <div>{children}</div>;
 };
 
 export default WebSocketProvider;

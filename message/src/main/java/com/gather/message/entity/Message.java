@@ -23,7 +23,8 @@ public class Message {
   private Status status;
   private UUID senderId;
   private UUID workspaceId;
-  private String attachment;
+  @Embedded
+  private Attachment attachment;
   private Date sentAt;
   private Date createdAt;
 }

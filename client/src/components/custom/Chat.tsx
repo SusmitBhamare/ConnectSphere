@@ -20,12 +20,15 @@ import { ScrollArea } from "../ui/scroll-area";
 import {
   getMessagesForUser,
   getMessagesForWorkspace,
+  uploadImage as uploadFile,
 } from "@/app/chat/workspaceClient";
 import MessageBubble from "./MessageBubble";
 import { User } from "@/app/types/User";
 import AttachmentModal from "./AttachmentModal";
 import { Badge } from "../ui/badge";
-import { MdClose } from "react-icons/md";
+import { MdClose, MdFileCopy, MdImage } from "react-icons/md";
+import { FaFile } from "react-icons/fa6";
+import { toast } from "sonner";
 
 function Chat({
   className,
@@ -43,7 +46,6 @@ function Chat({
   const { fetchUser, user } = useUserStore();
 
   useEffect(() => {
-    console.log("Selected chat: ", selectedChat);
     const fetchMessages = async () => {
       if (!selectedChat) return;
       let messages;
@@ -118,13 +120,22 @@ function Chat({
     return (chat as Workspace).members !== undefined;
   };
 
-  const sendMessage = () => {
+
+  const sendMessage = async () => {
     if (
       (messageInput.trim() !== "" || attachment) &&
       stompClient &&
       user &&
       selectedChat
     ) {
+      let attachmentObj = null;
+      try{
+        attachmentObj = attachment ? await uploadFile(attachment, cookie) : null;
+      } catch(e){
+        toast.error("Error sending message with attachment");
+        return;
+      }
+      
       const message: Message = {
         content: messageInput,
         receiverIds: isWorkspace(selectedChat)
@@ -132,7 +143,7 @@ function Chat({
           : [selectedChat.id],
         senderId: user.id,
         workspaceId: isWorkspace(selectedChat) ? selectedChat.id : "",
-        attachment: attachment,
+        attachment: attachmentObj,
         createdAt: new Date(),
         status: Status.SENT,
       };
@@ -147,6 +158,7 @@ function Chat({
       );
 
       setMessageInput(""); // Clear input after sending message
+      setAttachment(null); // Clear attachment after sending message
       fetchUser(); // Fetching latest user interactions after sending message
     }
   };
@@ -210,6 +222,7 @@ function Chat({
                       variant={"secondary"}
                       className="text-sm md:text-base flex gap-2 items-center "
                     >
+                      {attachment.type.startsWith("image") ? <MdImage/> : <FaFile/> }
                       {attachment?.name}{" "}
                       <MdClose
                         onClick={() => setAttachment(null)}

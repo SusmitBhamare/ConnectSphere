@@ -97,7 +97,7 @@ export async function getMessagesForWorkspace(workspaceId: string, token: string
 
 }
 
-export async function getMessagesForUser(senderId : string, receiverId: string, token: string | undefined | null) {
+export async function getMessagesForUser(senderId: string, receiverId: string, token: string | undefined | null) {
   try {
     const response = await axios.get(messageUrl + "/messages/user/" + senderId + "/" + receiverId, {
       headers: {
@@ -107,5 +107,22 @@ export async function getMessagesForUser(senderId : string, receiverId: string, 
     return response.data;
   } catch (e) {
     return null;
+  }
+}
+
+export async function uploadImage(file: File, token: string | undefined | null) {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await axios.post(messageUrl + "/upload", formData, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    return response.data;
+
+  } catch (e) {
+    throw new Error("Error uploading image");
   }
 }

@@ -18,11 +18,12 @@ function AttachmentModal({setAttachment} : {setAttachment: React.Dispatch<React.
   const [open , setOpen] = useState(false);
   const handleSubmit = (files: any) => {
     setAttachment(files[0].file);
+    console.log(files[0].file);
     setOpen(false);
   };
 
   return (
-    <Dialog onOpenChange={()=>setOpen(true)} open={open}>
+    <Dialog onOpenChange={()=>setOpen(!open)} open={open}>
       <DialogTrigger asChild>
         <Button variant="secondary">
           <MdAttachment />

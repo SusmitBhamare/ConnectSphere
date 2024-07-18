@@ -21,7 +21,6 @@ public interface UserClient {
     @PutMapping("/util/user/workspace/{userId}")
     void addUserToWorkspace(@PathVariable UUID userId, UUID workspaceId);
 
-
     @DeleteMapping("/util/user/workspace/{userId}")
     void removeUserFromWorkspace(@PathVariable UUID userId, UUID workspaceId);
 

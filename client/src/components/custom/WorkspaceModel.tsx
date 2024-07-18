@@ -4,10 +4,12 @@ import { Button } from "../ui/button";
 import { HiPlusCircle } from "react-icons/hi2";
 import {
   Command,
+  CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
+  CommandSeparator,
 } from "@/components/ui/command";
 
 import {
@@ -47,8 +49,11 @@ import { User } from "@/app/types/User";
 import useUserStore from "@/app/zustand/store";
 import { toast } from "sonner";
 
-
-function WorkspaceModel({ setWorkspaceCreated }: { setWorkspaceCreated : (value : boolean) => void}) {
+function WorkspaceModel({
+  setWorkspaceCreated,
+}: {
+  setWorkspaceCreated: (value: boolean) => void;
+}) {
   const [searchUser, setSearchUser] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<string>("");
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
@@ -62,7 +67,7 @@ function WorkspaceModel({ setWorkspaceCreated }: { setWorkspaceCreated : (value 
 
   const debouncedResults = useCallback(
     debounce(async (username: string) => {
-      const result = await getUser(username , cookie ? cookie : "");
+      const result = await getUser(username, cookie ? cookie : "");
       if (result) {
         if (
           result.username === username &&
@@ -79,6 +84,7 @@ function WorkspaceModel({ setWorkspaceCreated }: { setWorkspaceCreated : (value 
   );
 
   const searchUserHandler = async (username: string) => {
+    
     setCurrentUser(username);
     debouncedResults(username);
   };
@@ -88,31 +94,36 @@ function WorkspaceModel({ setWorkspaceCreated }: { setWorkspaceCreated : (value 
     setSearchUser(searchUser.filter((user) => user.username !== data.username));
   };
 
-  const removeFromSelectedUsers = (data : User) => {
-    setSelectedUsers(selectedUsers.filter((user) => user.username !== data.username));
+  const removeFromSelectedUsers = (data: User) => {
+    setSelectedUsers(
+      selectedUsers.filter((user) => user.username !== data.username)
+    );
   };
 
-  const createWorkspaceHandler: SubmitHandler<WorkspaceSchema> = async (data) => {
-    const userIds = selectedUsers.reduce((acc , user) => {acc.push(user.id); return acc} , [] as string[]);
-      if(userIds.length === 0){
-        toast.error("Please add atleast one user to the workspace");
-        return;
-      }
-      if(await createWorkspace({ ...data, members: userIds } ,cookie ? cookie : "")){
-        form.reset({
-          name: "",
-          description : "",
-        });
-        setWorkspaceCreated(true);
-        setCurrentUser("");
-        setSelectedUsers([]);
-        setOpen(false);
-      }
-      
-
+  const createWorkspaceHandler: SubmitHandler<WorkspaceSchema> = async (
+    data
+  ) => {
+    const userIds = selectedUsers.reduce((acc, user) => {
+      acc.push(user.id);
+      return acc;
+    }, [] as string[]);
+    if (userIds.length === 0) {
+      toast.error("Please add atleast one user to the workspace");
+      return;
+    }
+    if (
+      await createWorkspace({ ...data, members: userIds }, cookie ? cookie : "")
+    ) {
+      form.reset({
+        name: "",
+        description: "",
+      });
+      setWorkspaceCreated(true);
+      setCurrentUser("");
+      setSelectedUsers([]);
+      setOpen(false);
+    }
   };
-
-  
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -167,16 +178,17 @@ function WorkspaceModel({ setWorkspaceCreated }: { setWorkspaceCreated : (value 
                 />
                 <Label htmlFor="user">Users</Label>
                 <Command>
-                  <CommandInput asChild>
-                    <Input
-                      id="user"
-                      type="search"
-                      value={currentUser}
-                      className="w-full"
-                      onChange={(e) => searchUserHandler(e.target.value)}
-                    />
-                  </CommandInput>
-                  <CommandList>
+                  <CommandInput
+                    id="user"
+                    value={currentUser}
+                    className="w-full"
+                    onChangeCapture={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      searchUserHandler(e.target.value)
+                    }
+                  />
+                  <CommandSeparator />
+                  <CommandList title="Search Results">
+                    <CommandEmpty>No users selected</CommandEmpty>
                     <CommandGroup title="Users">
                       {searchUser?.map((user) => (
                         <CommandItem

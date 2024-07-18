@@ -1,10 +1,11 @@
 package com.gather.message.service.impl;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.gather.message.client.UserClient;
 import com.gather.message.client.WorkspaceClient;
-import com.gather.message.dto.MessageWithAttachmentDTO;
 import com.gather.message.dummy.AddUsersInteractedDTO;
 import com.gather.message.service.CloudinaryService;
 import org.slf4j.Logger;
@@ -20,6 +21,7 @@ import com.gather.message.service.MessageService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -56,19 +58,18 @@ public class MessageServiceImpl implements MessageService {
   }
 
   @Override
-  public MessageDTO sendMessage(MessageWithAttachmentDTO message) {
+  public MessageDTO sendMessage(Message message) {
     message.setSentAt(new Date());
-    Message message1 = convertToMessage(message);
     for (UUID receiverId : message.getReceiverIds()) {
       AddUsersInteractedDTO addUsersInteractedDTO = new AddUsersInteractedDTO(receiverId);
       System.out.println("addUsersInteractedDTO: " + addUsersInteractedDTO);
       userClient.addUsersInteracted(message.getSenderId(), addUsersInteractedDTO);
-      redisTemplate.convertAndSend("/topic/messages", message1);
-      String key = generateKeyForRedisConversation(message1.getSenderId(), receiverId);
-      redisTemplate.opsForList().rightPush(key, message1);
+      redisTemplate.convertAndSend("/topic/messages", message);
+      String key = generateKeyForRedisConversation(message.getSenderId(), receiverId);
+      redisTemplate.opsForList().rightPush(key, message);
     }
-    messageRepository.save(message1);
-    return messageDTOMapper(message1);
+    messageRepository.save(message);
+    return messageDTOMapper(message);
   }
 
   private static String generateKeyForRedisConversation(UUID id1, UUID id2) {
@@ -79,31 +80,12 @@ public class MessageServiceImpl implements MessageService {
 
 
   @Override
-  public MessageDTO sendMessageToWorkspace(MessageWithAttachmentDTO message) {
+  public MessageDTO sendMessageToWorkspace(Message message) {
     message.setSentAt(new Date());
-    // Image
-    Message message1 = convertToMessage(message);
-    redisTemplate.convertAndSend("/topic/messages/ " + message.getWorkspaceId(), message1);
-    redisTemplate.opsForList().rightPush("workspace:" + message.getWorkspaceId() + ":messages", message1);
-    messageRepository.save(message1);
-    return messageDTOMapper(message1);
-  }
-
-  private Message convertToMessage(MessageWithAttachmentDTO messageDTO) {
-    Message message = new Message();
-    message.setId(UUID.randomUUID());
-    message.setContent(messageDTO.getContent());
-    message.setSenderId(messageDTO.getSenderId());
-    message.setReceiverIds(messageDTO.getReceiverIds());
-    message.setWorkspaceId(messageDTO.getWorkspaceId());
-    if(messageDTO.getAttachment() != null){
-      message.setAttachment(cloudinaryService.upload(messageDTO.getAttachment() , messageDTO.getSenderId().toString()));
-    } else{
-      message.setAttachment("");
-    }
-    message.setSentAt(new Date());
-    message.setCreatedAt(new Date());
-    return message;
+    redisTemplate.convertAndSend("/topic/messages/ " + message.getWorkspaceId(), message);
+    redisTemplate.opsForList().rightPush("workspace:" + message.getWorkspaceId() + ":messages", message);
+    messageRepository.save(message);
+    return messageDTOMapper(message);
   }
 
 
@@ -154,6 +136,7 @@ public class MessageServiceImpl implements MessageService {
     map.put("connectedUsers", connectedUsers);
     return map;
   }
+
 
 
 }

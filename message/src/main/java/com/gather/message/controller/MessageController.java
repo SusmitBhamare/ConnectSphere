@@ -1,20 +1,20 @@
 package com.gather.message.controller;
 
-import com.gather.message.dto.MessageWithAttachmentDTO;
+import com.gather.message.dto.FileUploadDTO;
+import com.gather.message.entity.Attachment;
 import com.gather.message.entity.Message;
+import com.gather.message.service.CloudinaryService;
 import com.gather.message.util.TokenUtility;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.gather.message.dto.MessageDTO;
 import com.gather.message.service.MessageService;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -27,10 +27,11 @@ import java.util.UUID;
 public class MessageController {
 
     private final MessageService messageService;
+    private final CloudinaryService cloudinaryService;
 
     @MessageMapping("/chat")
     @SendTo("/topic/messages")
-    public MessageDTO sendMessage(@RequestBody MessageWithAttachmentDTO message, SimpMessageHeaderAccessor headerAccessor) {
+    public MessageDTO sendMessage(@RequestBody Message message, SimpMessageHeaderAccessor headerAccessor) {
         TokenUtility.storeToken(headerAccessor);
         if (message.getWorkspaceId() != null) {
             return messageService.sendMessageToWorkspace(message);
@@ -54,6 +55,11 @@ public class MessageController {
     @SendTo("/topic/connectedUsers")
     public Map<String, Set<String>> getConnectedUsers() {
         return messageService.getConnectedUsers();
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<Attachment> uploadFile(FileUploadDTO fileUploadDTO){
+        return ResponseEntity.ok(cloudinaryService.upload(fileUploadDTO.getFile()));
     }
 
 
