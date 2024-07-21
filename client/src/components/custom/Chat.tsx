@@ -27,8 +27,9 @@ import { User } from "@/app/types/User";
 import AttachmentModal from "./AttachmentModal";
 import { Badge } from "../ui/badge";
 import { MdClose, MdFileCopy, MdImage } from "react-icons/md";
-import { FaFile } from "react-icons/fa6";
+import { FaFile, FaFilePdf } from "react-icons/fa6";
 import { toast } from "sonner";
+import { useUploadThing } from "@/app/utils/uploadthing";
 
 function Chat({
   className,
@@ -44,6 +45,18 @@ function Chat({
   const [loading, setLoading] = useState<boolean>(true);
   const cookie = useUserStore((state) => state.token); // Assuming this fetches the token correctly
   const { fetchUser, user } = useUserStore();
+  const { startUpload } = useUploadThing("imageUploader");
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    console.log(attachment);
+  }, [attachment]);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -120,7 +133,6 @@ function Chat({
     return (chat as Workspace).members !== undefined;
   };
 
-
   const sendMessage = async () => {
     if (
       (messageInput.trim() !== "" || attachment) &&
@@ -129,13 +141,17 @@ function Chat({
       selectedChat
     ) {
       let attachmentObj = null;
-      try{
-        attachmentObj = attachment ? await uploadFile(attachment, cookie) : null;
-      } catch(e){
-        toast.error("Error sending message with attachment");
-        return;
+      if (attachment) {
+        const response = await startUpload([attachment]);
+        if (response) {
+          const res = response;
+          attachmentObj = res[0].serverData;
+        } else {
+          toast.error("Failed to upload attachment");
+          return;
+        }
       }
-      
+
       const message: Message = {
         content: messageInput,
         receiverIds: isWorkspace(selectedChat)
@@ -147,7 +163,6 @@ function Chat({
         createdAt: new Date(),
         status: Status.SENT,
       };
-      
 
       stompClient.send(
         "/app/chat", // Destination
@@ -191,9 +206,9 @@ function Chat({
               <h1 className="text-2xl">Loading messages...</h1>
             </div>
           ) : (
-            <ScrollArea
-              type="always"
-              className="h-[29rem] rounded-md overflow-y-auto"
+            <div
+              ref={scrollRef}
+              className="h-[29rem] rounded-md overflow-y-auto "
             >
               <div className="flex flex-col px-4">
                 {messages.map((message, index) => (
@@ -204,7 +219,7 @@ function Chat({
                   />
                 ))}
               </div>
-            </ScrollArea>
+            </div>
           )}
           <div className="absolute w-full bottom-0">
             <div className="flex items-center justify-between px-4 py-2 rounded-b-lg">
@@ -222,7 +237,13 @@ function Chat({
                       variant={"secondary"}
                       className="text-sm md:text-base flex gap-2 items-center "
                     >
-                      {attachment.type.startsWith("image") ? <MdImage/> : <FaFile/> }
+                      {attachment.type.startsWith("image") ? (
+                        <MdImage />
+                      ) : attachment.type.startsWith("application/pdf") ? (
+                        <FaFilePdf />
+                      ) : (
+                        <FaFile />
+                      )}
                       {attachment?.name}{" "}
                       <MdClose
                         onClick={() => setAttachment(null)}
@@ -233,7 +254,10 @@ function Chat({
                 )}
               </div>
               <div className="flex gap-2 items-center px-3">
-                <AttachmentModal setAttachment={setAttachment} />
+                <AttachmentModal
+                  attachment={attachment}
+                  setAttachment={setAttachment}
+                />
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>

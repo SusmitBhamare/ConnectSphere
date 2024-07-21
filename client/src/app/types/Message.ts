@@ -24,7 +24,7 @@ export interface Attachment{
   name : string,
   type : string,
   size : number
-  extension : string
+  extension : string | undefined
 }
 
 export interface MessageResponse {

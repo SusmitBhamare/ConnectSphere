@@ -1,13 +1,10 @@
 package com.gather.message.service.impl;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.gather.message.client.UserClient;
 import com.gather.message.client.WorkspaceClient;
 import com.gather.message.dummy.AddUsersInteractedDTO;
-import com.gather.message.service.CloudinaryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -21,7 +18,6 @@ import com.gather.message.service.MessageService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +30,6 @@ public class MessageServiceImpl implements MessageService {
   private final WorkspaceClient workspaceClient;
   private final RedisTemplate<String, Message> redisTemplate;
   private final RedisTemplate<String, String> stringRedisTemplate;
-  private final CloudinaryService cloudinaryService;
 
 
   public MessageDTO messageDTOMapper(Message message) {

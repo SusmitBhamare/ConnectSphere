@@ -36,6 +36,22 @@ services:
     networks:
       - employee-network
 
+  minio:
+    image: minio/minio:latest
+    restart: always
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio-data:/data
+      - minio-config:/root/.minio
+    ports:
+      - 9000:9000
+      - 9001:9001
+    command: server /data --console-address ":9001"
+    networks:
+      - employee-network
+
 networks:
   employee-network:
     driver: bridge
@@ -43,3 +59,5 @@ networks:
 volumes:
   postgres:
   pgadmin:
+  minio-data:
+  minio-config:

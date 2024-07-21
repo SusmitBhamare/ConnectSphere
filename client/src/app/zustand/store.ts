@@ -21,7 +21,7 @@ interface UserStoreState {
 }
 
 // Define the function to fetch the current user
-async function getCurrentUser() {
+export async function getCurrentUser() {
   try {
     const response = await axios.get(url + "/profile", {
       headers: {

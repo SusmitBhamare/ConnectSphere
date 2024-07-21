@@ -7,8 +7,9 @@ import { MdImage } from "react-icons/md";
 import { Button } from "../ui/button";
 import axios from "axios";
 import { toast } from "sonner";
-import { FaFile } from "react-icons/fa6";
+import { FaFile, FaFilePdf } from "react-icons/fa6";
 import Image from "next/image";
+import Link from "next/link";
 
 const MessageBubble = ({
   message,
@@ -24,15 +25,24 @@ const MessageBubble = ({
 
   const handleDownload = async (
     message: MessageResponse,
-    url: string | undefined
+    endpoint: string | undefined
   ) => {
-    if (!url) return;
-    const a = document.createElement("a");
-    a.style.display = "none";
-    a.href = url;
-    a.download = message.id;
-    document.body.appendChild(a);
-    a.click();
+    if(!endpoint) return;
+
+    try{
+      const response = await axios.get(endpoint , {
+        responseType: "blob"
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", message.attachment?.name || "file");
+      document.body.appendChild(link);
+      link.click();
+    }catch(e){
+      toast.error("Failed to download file");
+    }
   };
   return (
     <div
@@ -71,7 +81,11 @@ const MessageBubble = ({
               <div className="flex gap-2 w-full items-center font-semibold p-2">
                 {message.attachment.type.startsWith("image") ? (
                   <MdImage className="w-5 h-5" />
-                ) : (
+                ) :
+                message.attachment.type.startsWith("pdf") ? (
+                  <FaFilePdf className="w-5 h-5" />
+                )               
+                : (
                   <FaFile className="w-5 h-5" />
                 )}
                 <p
@@ -92,11 +106,11 @@ const MessageBubble = ({
                 </Button>
                 <Button
                   size={"sm"}
+                  className="w-full rounded-tl-none rounded-bl-none"
+                  variant={"secondary"}
                   onClick={() =>
                     handleDownload(message, message.attachment?.url)
                   }
-                  className="w-full rounded-tl-none rounded-bl-none"
-                  variant={"secondary"}
                 >
                   Download
                 </Button>
@@ -104,7 +118,7 @@ const MessageBubble = ({
             </div>
           )}
           <div
-            className={` rounded-lg px-4 py-2 ${
+            className={` rounded-lg px-4 break-words text-wrap max-w-full py-2 ${
               isUser ? "bg-primary/10" : "bg-primary/50"
             }`}
           >

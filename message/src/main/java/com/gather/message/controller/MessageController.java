@@ -1,9 +1,7 @@
 package com.gather.message.controller;
 
 import com.gather.message.dto.FileUploadDTO;
-import com.gather.message.entity.Attachment;
 import com.gather.message.entity.Message;
-import com.gather.message.service.CloudinaryService;
 import com.gather.message.util.TokenUtility;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.gather.message.dto.MessageDTO;
 import com.gather.message.service.MessageService;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +24,6 @@ import java.util.UUID;
 public class MessageController {
 
     private final MessageService messageService;
-    private final CloudinaryService cloudinaryService;
 
     @MessageMapping("/chat")
     @SendTo("/topic/messages")
@@ -57,10 +53,6 @@ public class MessageController {
         return messageService.getConnectedUsers();
     }
 
-    @PostMapping("/upload")
-    public ResponseEntity<Attachment> uploadFile(FileUploadDTO fileUploadDTO){
-        return ResponseEntity.ok(cloudinaryService.upload(fileUploadDTO.getFile()));
-    }
 
 
 }
