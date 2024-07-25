@@ -5,7 +5,6 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import {zodResolver} from '@hookform/resolvers/zod';
 import { signupSchema, SignupSchema } from '@/lib/schemas/signupSchema';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import {toast} from 'sonner';
 import { doesUserExist, register } from './registerClient';

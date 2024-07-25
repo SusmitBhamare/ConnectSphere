@@ -2,6 +2,7 @@ package com.gather.message.service;
 
 import com.gather.message.dto.MessageDTO;
 import com.gather.message.entity.Message;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -21,5 +22,6 @@ public interface MessageService {
 
   Map<String, Set<String>> getConnectedUsers();
 
+  ResponseEntity<List<MessageDTO>> getMissedMessages(UUID userId);
 
 }

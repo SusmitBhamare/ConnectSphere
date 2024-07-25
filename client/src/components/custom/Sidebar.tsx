@@ -119,7 +119,6 @@ function Sidebar({
     return (
       <div
         onClick={() => {
-          console.log("clicked");
           handleSelectChat(workspace.id, workspace);
         }}
         className={`${

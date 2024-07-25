@@ -7,6 +7,10 @@ import { redirect, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import useUserStore from "@/app/zustand/store";
 import WebSocketService from "@/app/utils/socket";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "../ui/dropdown-menu";
+import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import Notifications from "./Notifications";
 
 function Home() {
   const { token, setOnlineMembers, fetchUser, onlineMembers, user } =
@@ -40,7 +44,7 @@ function Home() {
       });
   };
 
-  return !token ? (
+  return !token || !user ? (
     <div className="flex flex-col md:flex-row gap-2">
       <Button asChild>
         <Link className="" href={"/login"}>
@@ -52,7 +56,29 @@ function Home() {
       </Button>
     </div>
   ) : (
-    <Button onClick={logoutHandler}>Logout</Button>
+    <div className="flex gap-2 items-center">
+    <Notifications/>
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <Avatar>
+          <AvatarImage src={user?.image ?? ""} />
+          <AvatarFallback>{user?.name.toUpperCase()[0]}</AvatarFallback>
+        </Avatar>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>
+          <Link href={"/settings"}>Settings</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Button variant={"ghost"} onClick={logoutHandler}>
+            Logout
+          </Button>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+    </div>
   );
 }
 

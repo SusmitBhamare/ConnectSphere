@@ -8,7 +8,8 @@ import { User } from "../types/User";
 
 const ChatPage = () => {
   const [selectedChat, setSelectedChat] = useState<Workspace | User | null>(null);
-  const { user } = useUserStore();
+  const { fetchUser,  user } = useUserStore();
+
   useEffect(() => {
     if(typeof window !== "undefined"){
       const queryParams = new URLSearchParams(window.location.search);
@@ -19,10 +20,13 @@ const ChatPage = () => {
 
       const userId = queryParams.get("user");
       if(userId){
+        if(user?.usersInteractedWith.find((user) => user.id === userId) === undefined){
+          fetchUser();
+        }
         setSelectedChat((prev) => prev = user?.usersInteractedWith.find((user) => user.id === userId) || null);
       }
     }
-  } , [window]);
+  } , [window.location]);
 
   return (
     <div className="max-w-screen h-[90vh] grid grid-cols-4 mt-16">

@@ -126,3 +126,16 @@ export async function uploadImage(file: File, token: string | undefined | null) 
     throw new Error("Error uploading image");
   }
 }
+
+export async function getNotifications(token: string | undefined | null , userId : string){
+  try{
+    const response = await axios.get(messageUrl + "/notifications/" + userId , {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    return response.data;
+  } catch(e){
+    return null;
+  }
+}

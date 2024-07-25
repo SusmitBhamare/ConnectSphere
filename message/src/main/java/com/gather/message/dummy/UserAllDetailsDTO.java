@@ -3,7 +3,6 @@ package com.gather.message.dummy;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.catalina.User;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -20,6 +19,6 @@ public class UserAllDetailsDTO {
     private Collection<UUID> messagesSent;
     private Collection<UUID> messagesReceived;
     private Collection<Workspace> workspaces;
-    private Collection<UserAllDetailsDTO> usersInteractedWith;
+    private Collection<User> usersInteractedWith;
 
 }

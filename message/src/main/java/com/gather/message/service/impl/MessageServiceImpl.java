@@ -1,13 +1,17 @@
 package com.gather.message.service.impl;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import com.gather.message.client.UserClient;
 import com.gather.message.client.WorkspaceClient;
 import com.gather.message.dummy.AddUsersInteractedDTO;
+import com.gather.message.dummy.UserAllDetailsDTO;
+import com.gather.message.entity.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +34,7 @@ public class MessageServiceImpl implements MessageService {
   private final WorkspaceClient workspaceClient;
   private final RedisTemplate<String, Message> redisTemplate;
   private final RedisTemplate<String, String> stringRedisTemplate;
+  private static final String OFFLINE_MESSAGES_KEY = "offlineMessages:";
 
 
   public MessageDTO messageDTOMapper(Message message) {
@@ -40,7 +45,8 @@ public class MessageServiceImpl implements MessageService {
 
     messageDTO.setReceivers(new ArrayList<>());
     for (UUID receiverId : message.getReceiverIds()) {
-      messageDTO.getReceivers().add(userClient.getUserById(receiverId));
+      UserAllDetailsDTO user = userClient.getUserById(receiverId);
+      messageDTO.getReceivers().add(user);
     }
 
     if (message.getWorkspaceId() != null) {
@@ -57,14 +63,27 @@ public class MessageServiceImpl implements MessageService {
     message.setSentAt(new Date());
     for (UUID receiverId : message.getReceiverIds()) {
       AddUsersInteractedDTO addUsersInteractedDTO = new AddUsersInteractedDTO(receiverId);
-      System.out.println("addUsersInteractedDTO: " + addUsersInteractedDTO);
       userClient.addUsersInteracted(message.getSenderId(), addUsersInteractedDTO);
-      redisTemplate.convertAndSend("/topic/messages", message);
-      String key = generateKeyForRedisConversation(message.getSenderId(), receiverId);
+    }
+    MessageDTO messageDTO = messageDTOMapper(message);
+
+    for (UserAllDetailsDTO user : messageDTO.getReceivers()) {
+      if (!isUserOnline(user.getUsername())) {
+        storeOfflineMessage(user.getId(), message);
+      } else {
+        redisTemplate.convertAndSend("/topic/messages", message);
+      }
+      String key = generateKeyForRedisConversation(message.getSenderId(), user.getId());
       redisTemplate.opsForList().rightPush(key, message);
     }
+
     messageRepository.save(message);
-    return messageDTOMapper(message);
+
+    return messageDTO;
+  }
+
+  private void storeOfflineMessage(UUID id, Message message) {
+    redisTemplate.opsForList().rightPush(OFFLINE_MESSAGES_KEY + id, message);
   }
 
   private static String generateKeyForRedisConversation(UUID id1, UUID id2) {
@@ -104,7 +123,8 @@ public class MessageServiceImpl implements MessageService {
   }
 
   @Override
-  @Transactional // This annotation is used to specify that the method is a transactional method. i.e. it will be executed within a transaction.
+  @Transactional
+  // This annotation is used to specify that the method is a transactional method. i.e. it will be executed within a transaction.
   public List<MessageDTO> getMessagesForConversation(UUID senderId, UUID receiverId) {
     String key = generateKeyForRedisConversation(senderId, receiverId);
     List<Message> messages = redisTemplate.opsForList().range(key, 0, -1);
@@ -132,6 +152,28 @@ public class MessageServiceImpl implements MessageService {
     return map;
   }
 
+  @Override
+  public ResponseEntity<List<MessageDTO>> getMissedMessages(UUID userId) {
+    List<Message> offlineMessages = redisTemplate.opsForList().range(OFFLINE_MESSAGES_KEY + userId, 0, -1);
+    if (offlineMessages == null) {
+      return ResponseEntity.ok(new ArrayList<>());
+    }
+
+    List<MessageDTO> messageDTOS = new ArrayList<>();
+    for (Message message : offlineMessages) {
+      messageDTOS.add(messageDTOMapper(message));
+      userClient.addUsersInteracted(userId , new AddUsersInteractedDTO(message.getSenderId()));
+    }
+
+    redisTemplate.delete(OFFLINE_MESSAGES_KEY + userId);
+
+    return ResponseEntity.ok(messageDTOS);
+  }
+
+
+  private boolean isUserOnline(String username) {
+    return Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember("connectedUsers", username));
+  }
 
 
 }

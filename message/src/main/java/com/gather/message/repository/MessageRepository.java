@@ -15,4 +15,6 @@ public interface MessageRepository extends JpaRepository<Message,UUID> {
 
     List<Message> findAllBySenderIdAndReceiverIdsContains(UUID senderId, UUID receiverId);
 
+  List<Message> findAllByReceiverIdsContains(UUID userId);
+
 }

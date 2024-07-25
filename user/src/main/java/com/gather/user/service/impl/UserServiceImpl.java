@@ -93,14 +93,10 @@ public class UserServiceImpl implements UserService {
       if (interactedUser == null) {
         continue;
       }
-      UserAllDetailsDTO interactedUserDTO = userToUserAllDetailsDTO(interactedUser);
-      if (interactedUserDTO != null && !userAllDetailsDTO.getUsersInteractedWith().contains(interactedUserDTO)) {
-        userAllDetailsDTO.getUsersInteractedWith().add(interactedUserDTO);
-      }
+      userAllDetailsDTO.getUsersInteractedWith().add(interactedUser);
     }
     userAllDetailsDTO.setMessagesReceived(new ArrayList<>());
     userAllDetailsDTO.setMessagesSent(new ArrayList<>());
-
     return userAllDetailsDTO;
   }
 
@@ -108,6 +104,9 @@ public class UserServiceImpl implements UserService {
   @Override
   public UserAllDetailsDTO getUserById(UUID userId) {
     User user = userRepository.findById(userId).orElse(null);
+    if(user == null){
+      throw new IllegalArgumentException("User not found");
+    }
     return userToUserAllDetailsDTO(user);
   }
 

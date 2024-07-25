@@ -2,7 +2,7 @@ package com.gather.workspace.client;
 
 
 import com.gather.workspace.auth.FeignClientConfiguration;
-import com.gather.workspace.dummy.User;
+import com.gather.workspace.dummy.UserAllDetailsDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +16,7 @@ import java.util.UUID;
 public interface UserClient {
 
     @GetMapping("/util/profile")
-    User getProfile();
+    UserAllDetailsDTO getProfile();
 
     @PutMapping("/util/user/workspace/{userId}")
     void addUserToWorkspace(@PathVariable UUID userId, UUID workspaceId);
@@ -25,6 +25,6 @@ public interface UserClient {
     void removeUserFromWorkspace(@PathVariable UUID userId, UUID workspaceId);
 
     @GetMapping("/util/user/id/{userId}")
-    User getUserById(@PathVariable UUID userId);
+    UserAllDetailsDTO getUserById(@PathVariable UUID userId);
 
 }

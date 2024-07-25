@@ -1,15 +1,12 @@
-package com.gather.user.dto;
+package com.gather.message.dummy;
 
-import com.gather.user.dummy.Workspace;
-import com.gather.user.entity.Role;
-import com.gather.user.entity.User;
 import lombok.Data;
 
 import java.util.Collection;
 import java.util.UUID;
 
 @Data
-public class UserAllDetailsDTO {
+public class User {
     private UUID id;
     private String name;
     private String username;
@@ -18,6 +15,6 @@ public class UserAllDetailsDTO {
     private Role role;
     private Collection<UUID> messagesSent;
     private Collection<UUID> messagesReceived;
-    private Collection<Workspace> workspaces;
-    private Collection<User> usersInteractedWith;
+    private Collection<UUID> workspaces;
+    private Collection<UUID> usersInteractedWith;
 }

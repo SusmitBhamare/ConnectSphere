@@ -2,16 +2,13 @@ package com.gather.workspace.controller;
 
 
 import com.gather.workspace.client.UserClient;
-import com.gather.workspace.dto.WorkspaceDTO;
-import com.gather.workspace.dummy.User;
+import com.gather.workspace.dummy.UserAllDetailsDTO;
 import com.gather.workspace.entity.Workspace;
 import com.gather.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,7 +41,7 @@ public class WorkspaceController {
     }
 
     @GetMapping("/members/{workspaceId}")
-    public ResponseEntity<List<User>> getMembers(@PathVariable UUID workspaceId){
+    public ResponseEntity<List<UserAllDetailsDTO>> getMembers(@PathVariable UUID workspaceId){
         return ResponseEntity.ok(workspaceService.getMembers(workspaceId));
     }
 

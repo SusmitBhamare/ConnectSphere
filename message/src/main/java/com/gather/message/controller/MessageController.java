@@ -4,7 +4,9 @@ import com.gather.message.dto.FileUploadDTO;
 import com.gather.message.entity.Message;
 import com.gather.message.util.TokenUtility;
 import lombok.AllArgsConstructor;
+import org.simpleframework.xml.Path;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -54,5 +56,9 @@ public class MessageController {
     }
 
 
+    @GetMapping("/notifications/{userId}")
+    public ResponseEntity<List<MessageDTO>> notificationMessages(@PathVariable UUID userId) {
+        return messageService.getMissedMessages(userId);
+    }
 
 }

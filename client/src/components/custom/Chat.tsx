@@ -27,9 +27,10 @@ import { User } from "@/app/types/User";
 import AttachmentModal from "./AttachmentModal";
 import { Badge } from "../ui/badge";
 import { MdClose, MdFileCopy, MdImage } from "react-icons/md";
-import { FaFile, FaFilePdf } from "react-icons/fa6";
+import { FaFile, FaFilePdf, FaSpinner } from "react-icons/fa6";
 import { toast } from "sonner";
 import { useUploadThing } from "@/app/utils/uploadthing";
+import { isWorkspace } from "@/app/utils/typeUtil";
 
 function Chat({
   className,
@@ -43,14 +44,11 @@ function Chat({
   const [attachment, setAttachment] = useState<File | null>(null);
   const [messages, setMessages] = useState<MessageResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isSending , setIsSending] = useState<boolean>(false);
   const cookie = useUserStore((state) => state.token); // Assuming this fetches the token correctly
-  const { fetchUser, user } = useUserStore();
+  const { fetchUser, user, notifications, setNotifications } = useUserStore();
   const { startUpload } = useUploadThing("imageUploader");
   const scrollRef = React.useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    console.log(attachment);
-  }, [attachment]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -59,6 +57,8 @@ function Chat({
   }, [messages]);
 
   useEffect(() => {
+    if (!selectedChat) return;
+
     const fetchMessages = async () => {
       if (!selectedChat) return;
       let messages;
@@ -83,7 +83,7 @@ function Chat({
   }, [fetchUser]);
 
   useEffect(() => {
-    if (!selectedChat) return; // Exit if no chat is selected
+    // if (!selectedChat) return; // Exit if no chat is selected
 
     const socket = new SockJS("http://localhost:8082/ws");
     const stomp = Stomp.over(() => socket);
@@ -110,13 +110,29 @@ function Chat({
   }, [selectedChat, cookie]);
 
   useEffect(() => {
-    if (!stompClient || !selectedChat) return;
+    if (!stompClient) return;
 
     const messageSubscription = stompClient?.subscribe(
       `/topic/messages`, // Subscribe to the topic specific to selected chat
       (message) => {
-        console.log("Received message: ", message.body);
         const messageResponse: MessageResponse = JSON.parse(message.body);
+
+        if (
+          !selectedChat ||(
+          isWorkspace(selectedChat) &&
+          messageResponse.workspaceId?.id !== selectedChat.id)
+        ) {
+          setNotifications([...notifications, messageResponse]);
+          return;
+        } else if (
+          !isWorkspace(selectedChat) &&
+          messageResponse.sender.id !== user?.id &&
+          messageResponse.sender.id !== selectedChat?.id
+        ) {
+          setNotifications([...notifications, messageResponse]);
+          alert(messageResponse.content + "-" + messageResponse.sender.username);
+          return;
+        }
         setMessages((prev) => [...prev, messageResponse]); // Update messages state
       },
       {
@@ -129,11 +145,10 @@ function Chat({
     };
   }, [stompClient, selectedChat, cookie]);
 
-  const isWorkspace = (chat: any): chat is Workspace => {
-    return (chat as Workspace).members !== undefined;
-  };
+
 
   const sendMessage = async () => {
+    setIsSending(true);
     if (
       (messageInput.trim() !== "" || attachment) &&
       stompClient &&
@@ -171,6 +186,8 @@ function Chat({
         },
         JSON.stringify(message) // Message content
       );
+
+      setIsSending(false);
 
       setMessageInput(""); // Clear input after sending message
       setAttachment(null); // Clear attachment after sending message
@@ -261,8 +278,12 @@ function Chat({
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button onClick={sendMessage}>
+                      <Button disabled={isSending} onClick={sendMessage}>
+                        {
+                          isSending ? <FaSpinner className="animate-spin"/> :
                         <RiSendPlaneFill />
+                        }
+                        
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Send Message</TooltipContent>
