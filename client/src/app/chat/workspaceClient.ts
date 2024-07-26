@@ -136,6 +136,6 @@ export async function getNotifications(token: string | undefined | null , userId
     });
     return response.data;
   } catch(e){
-    return null;
+    throw new Error("Error fetching notifications");
   }
 }

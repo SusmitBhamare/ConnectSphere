@@ -4,6 +4,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
@@ -13,27 +14,42 @@ import { addUsersInteracted } from "@/app/register/registerClient";
 import { MessageResponse } from "@/app/types/Message";
 import { useRouter } from "next/navigation";
 import { Separator } from "../ui/separator";
+import { getNotifications } from "@/app/chat/workspaceClient";
+import { toast } from "sonner";
+import { MdAttachFile, MdFileCopy, MdImage } from "react-icons/md";
 
 const Notifications = () => {
   const router = useRouter();
-  const { fetchUser, token, user, notifications , setNotifications } = useUserStore();
+  const { fetchUser, token, user, notifications, setNotifications } =
+    useUserStore();
   const [isPulsing, setIsPulsing] = useState<boolean>(false);
 
   useEffect(() => {
+    handleMissedNotification();
     fetchUser();
   }, []);
-  
+
   useEffect(() => {
     if (notifications.length > 0) {
       setIsPulsing(true);
-    } else{
+    } else {
       setIsPulsing(false);
     }
-  } , [notifications])
+  }, [notifications]);
 
-  
+  async function handleMissedNotification() {
+    if (!user) return;
+    getNotifications(token, user?.id)
+      .then((res) => {
+        if (res.length === 0) return;
+        setNotifications((prevNotifications) => [...res , ...prevNotifications]);
+      })
+      .catch((e) => {
+        toast.error("Error fetching notifications");
+      });
+  }
 
-  function handleNotificationClick(notification : MessageResponse){
+  function handleNotificationClick(notification: MessageResponse) {
     setNotifications(notifications.filter((n) => n.id !== notification.id));
     router.push(
       notification.workspaceId
@@ -41,9 +57,6 @@ const Notifications = () => {
         : "chat?user=" + notification.sender?.id
     );
   }
-
-  console.log(notifications);
-  
 
   useEffect(() => {
     if (!user) return;
@@ -68,26 +81,56 @@ const Notifications = () => {
           size={"icon"}
         >
           <BsBellFill />
-          {
-            isPulsing && <div className="w-2 h-2  rounded-full bg-red-500 absolute bottom-0 right-0 animate-pulse"/>
-          }
+          {isPulsing && (
+            <div className="w-2 h-2  rounded-full bg-red-500 absolute bottom-0 right-0 animate-pulse" />
+          )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
+        <DropdownMenuItem className="text-white">
+          Notifications
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         {notifications.map((notification) => (
-          <DropdownMenuItem className="text-white" key={notification?.id}>
-            <Button
-              variant={"ghost"}
-              onClick={() => handleNotificationClick(notification)}
+          <>
+            <DropdownMenuItem
+              className="text-white max-w-64"
+              key={notification.id}
               asChild
             >
-              {notification?.content}
-            </Button>
-          </DropdownMenuItem>
+              <Button
+                variant={"ghost"}
+                onClick={() => handleNotificationClick(notification)}
+                className="flex flex-col justify-start items-start w-full h-max"
+              >
+                <h1 className="text-primary text-xs">
+                  {notification.sender.name} has sent a message
+                  {notification.workspaceId &&
+                    " in " + notification.workspaceId.name}
+                </h1>
+                <p className="text-foreground flex gap-2 items-center text-balance line-clamp-2">
+                  {notification.content}
+                  {notification.attachment &&
+                    (notification.attachment.type === "image" ? (
+                      <MdImage />
+                    ) : (
+                      <MdFileCopy />
+                    ))}
+                </p>
+              </Button>
+            </DropdownMenuItem>
+          </>
         ))}
-        <Separator/>
-        <DropdownMenuItem asChild>
-          <Button variant={"destructive"} className="w-full" onClick={()=>setNotifications([])}>Clear</Button>
+        <Separator />
+        <DropdownMenuItem>
+          <Button
+            variant={"destructive"}
+            className="w-full"
+            size={"lg"}
+            onClick={() => setNotifications([])}
+          >
+            Clear
+          </Button>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

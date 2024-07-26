@@ -32,6 +32,7 @@ import { toast } from "sonner";
 import { useUploadThing } from "@/app/utils/uploadthing";
 import { isWorkspace } from "@/app/utils/typeUtil";
 import { set } from "react-hook-form";
+import { Textarea } from "../ui/textarea";
 
 function Chat({
   className,
@@ -45,6 +46,7 @@ function Chat({
   const [attachment, setAttachment] = useState<File | null>(null);
   const [messages, setMessages] = useState<MessageResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [alertUser , setAlertUser] = useState<boolean>(false);
   const [isSending, setIsSending] = useState<boolean>(false);
   const cookie = useUserStore((state) => state.token); // Assuming this fetches the token correctly
   const { fetchUser, user, notifications, setNotifications } = useUserStore();
@@ -114,13 +116,13 @@ function Chat({
     if (!stompClient) return;
 
     console.log("Subscribing to messages");
-    
+
     const messageSubscription = stompClient?.subscribe(
       `/topic/messages`, // Subscribe to the topic specific to selected chat
       (message) => {
         const messageResponse: MessageResponse = JSON.parse(message.body);
         console.log("Received message: ", messageResponse);
-        
+
         if (!isWorkspace(selectedChat) && messageResponse.receivers) {
           if (
             user &&
@@ -131,13 +133,13 @@ function Chat({
             fetchUser();
           }
         }
-        if(!isWorkspace){
+        if (!isWorkspace) {
           setNotifications([...notifications, messageResponse]);
           return;
         }
         if (
-          (isWorkspace(selectedChat) &&
-            messageResponse.workspaceId?.id !== selectedChat.id)
+          isWorkspace(selectedChat) &&
+          messageResponse.workspaceId?.id !== selectedChat.id
         ) {
           setNotifications([...notifications, messageResponse]);
           return;
@@ -147,9 +149,6 @@ function Chat({
           messageResponse.sender.id !== selectedChat?.id
         ) {
           setNotifications([...notifications, messageResponse]);
-          alert(
-            messageResponse.content + "-" + messageResponse.sender.username
-          );
           return;
         }
         setMessages((prev) => [...prev, messageResponse]); // Update messages state
@@ -212,6 +211,15 @@ function Chat({
     }
   };
 
+  const handleMessageInput = (value: string) => {
+    if(value.length > 200){
+      setAlertUser(true);
+    } else{
+      setAlertUser(false);
+    }
+    setMessageInput(value);
+  }
+
   return (
     <div className={cn(className, "min-h-full relative")}>
       {selectedChat ? (
@@ -258,12 +266,12 @@ function Chat({
           <div className="absolute w-full bottom-0">
             <div className="flex items-center justify-between px-4 py-2 rounded-b-lg">
               <div className="relative w-full">
-                <Input
-                  type="text"
+                <Textarea
+                rows={2}
                   placeholder="Send a message"
                   value={messageInput}
-                  onChange={(e) => setMessageInput(e.target.value)}
-                  className={`relative ${attachment ? "h-12" : ""}`}
+                  onChange={(e) => handleMessageInput(e.target.value)}
+                  className={`relative ${attachment ? "h-12" : ""} text-wrap resize-none`}
                 />
                 {attachment && (
                   <div className="absolute top-1/2 right-3 transform -translate-y-1/2 ">
@@ -286,6 +294,7 @@ function Chat({
                     </Badge>
                   </div>
                 )}
+                <span className={`absolute text-xs -top-5 left-0 ${alertUser ? 'text-destructive' : 'text-muted-foreground' }`}>{messageInput.length}/200 characters</span>
               </div>
               <div className="flex gap-2 items-center px-3">
                 <AttachmentModal
@@ -295,7 +304,7 @@ function Chat({
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button disabled={isSending} onClick={sendMessage}>
+                      <Button disabled={isSending || alertUser} onClick={sendMessage}>
                         {isSending ? (
                           <FaSpinner className="animate-spin" />
                         ) : (

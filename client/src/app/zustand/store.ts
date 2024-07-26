@@ -4,11 +4,8 @@ import { User } from '../types/User';
 import { persist, createJSONStorage } from 'zustand/middleware'
 import WebSocketService from '../utils/socket';
 import { MessageResponse } from '../types/Message';
-import { isGeneratorFunction } from 'util/types';
-import { addUsersInteracted } from '../register/registerClient';
 
 const url = "http://localhost:8081/util";
-
 
 interface UserStoreState {
   user: User | null;
@@ -21,8 +18,8 @@ interface UserStoreState {
   token: string | null;
   setToken: (token: string | null) => void;
   fetchUser: () => Promise<void>;
-  notifications: (MessageResponse)[];
-  setNotifications: (notifications: MessageResponse[]) => void;
+  notifications: MessageResponse[];
+  setNotifications: (notifications: MessageResponse[] | ((prevNotifications: MessageResponse[]) => MessageResponse[])) => void;
 }
 
 // Define the function to fetch the current user
@@ -43,20 +40,15 @@ export async function getCurrentUser() {
   }
 }
 
-async function getNotifications(notifications: MessageResponse[]) {
-
-}
-
-
 // Create a Zustand store
 const useUserStore = create<UserStoreState>()(
 
   persist((set) => ({
     stompClient: null,
     notifications: [],
-    setNotifications: (notifications) => {
-      set({ notifications });
-    },
+    setNotifications: (notifications) => set((state) => ({
+      notifications: typeof notifications === 'function' ? notifications(state.notifications) : notifications,
+    })),
     setStompClient: (stompClient: WebSocketService) => set({ stompClient }),
     user: null,
     isLoading: false,
@@ -74,7 +66,7 @@ const useUserStore = create<UserStoreState>()(
         set({ error, isLoading: false });
       }
     }
-  }), { name: 'userStore' })
+  }), { name: 'userStore'})
 
 );
 
