@@ -31,6 +31,7 @@ import { FaFile, FaFilePdf, FaSpinner } from "react-icons/fa6";
 import { toast } from "sonner";
 import { useUploadThing } from "@/app/utils/uploadthing";
 import { isWorkspace } from "@/app/utils/typeUtil";
+import { set } from "react-hook-form";
 
 function Chat({
   className,
@@ -44,7 +45,7 @@ function Chat({
   const [attachment, setAttachment] = useState<File | null>(null);
   const [messages, setMessages] = useState<MessageResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [isSending , setIsSending] = useState<boolean>(false);
+  const [isSending, setIsSending] = useState<boolean>(false);
   const cookie = useUserStore((state) => state.token); // Assuming this fetches the token correctly
   const { fetchUser, user, notifications, setNotifications } = useUserStore();
   const { startUpload } = useUploadThing("imageUploader");
@@ -112,15 +113,31 @@ function Chat({
   useEffect(() => {
     if (!stompClient) return;
 
+    console.log("Subscribing to messages");
+    
     const messageSubscription = stompClient?.subscribe(
       `/topic/messages`, // Subscribe to the topic specific to selected chat
       (message) => {
         const messageResponse: MessageResponse = JSON.parse(message.body);
-
+        console.log("Received message: ", messageResponse);
+        
+        if (!isWorkspace(selectedChat) && messageResponse.receivers) {
+          if (
+            user &&
+            !user.usersInteractedWith
+              .map((u) => u.id)
+              .includes(messageResponse?.receivers[0].id)
+          ) {
+            fetchUser();
+          }
+        }
+        if(!isWorkspace){
+          setNotifications([...notifications, messageResponse]);
+          return;
+        }
         if (
-          !selectedChat ||(
-          isWorkspace(selectedChat) &&
-          messageResponse.workspaceId?.id !== selectedChat.id)
+          (isWorkspace(selectedChat) &&
+            messageResponse.workspaceId?.id !== selectedChat.id)
         ) {
           setNotifications([...notifications, messageResponse]);
           return;
@@ -130,7 +147,9 @@ function Chat({
           messageResponse.sender.id !== selectedChat?.id
         ) {
           setNotifications([...notifications, messageResponse]);
-          alert(messageResponse.content + "-" + messageResponse.sender.username);
+          alert(
+            messageResponse.content + "-" + messageResponse.sender.username
+          );
           return;
         }
         setMessages((prev) => [...prev, messageResponse]); // Update messages state
@@ -144,8 +163,6 @@ function Chat({
       messageSubscription.unsubscribe(); // Unsubscribe when component unmounts or when selectedChat changes
     };
   }, [stompClient, selectedChat, cookie]);
-
-
 
   const sendMessage = async () => {
     setIsSending(true);
@@ -279,11 +296,11 @@ function Chat({
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button disabled={isSending} onClick={sendMessage}>
-                        {
-                          isSending ? <FaSpinner className="animate-spin"/> :
-                        <RiSendPlaneFill />
-                        }
-                        
+                        {isSending ? (
+                          <FaSpinner className="animate-spin" />
+                        ) : (
+                          <RiSendPlaneFill />
+                        )}
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Send Message</TooltipContent>

@@ -41,8 +41,12 @@ function Sidebar({
   );
 
   const searchUserHandler = async (username: string) => {
-    setSearchUser(username);
-    debouncedResults(username);
+    if (user?.usersInteractedWith.some((u) => u.username === username)) {
+      setSearchUser(username);
+    } else {
+      setSearchUser(username);
+      debouncedResults(username);
+    }
   };
 
   const handleSelectChat = (workspaceId: String, workspace: Workspace) => {
@@ -65,7 +69,7 @@ function Sidebar({
   useEffect(() => {
     fetchUser();
     setIsLoading(false);
-  }, [ , workspaceCreated]);
+  }, [workspaceCreated]);
 
   return (
     <div className="flex flex-col min-h-full w-full justify-between items-center  shadow-lg">

@@ -35,6 +35,7 @@ function Home() {
       )
       .then((res) => {
         useUserStore.getState().setToken(null);
+        useUserStore.getState().setNotifications([]);
         router.push("/login");
         toast.success("Logged out successfully");
       })
