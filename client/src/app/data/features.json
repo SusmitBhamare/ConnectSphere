@@ -1,0 +1,24 @@
+{
+  "features": [
+    {
+      "feature_title": "Create Workspaces and Chats",
+      "feature_description": "Easily set up dedicated workspaces for different teams or projects, and initiate group or private chats for seamless communication and collaboration.",
+      "color" : "bg-primary"
+    },
+    {
+      "feature_title": "Monitor Workspace Chats and Employees",
+      "feature_description": "Keep track of all workspace activities, monitor ongoing conversations, and oversee employee interactions to ensure effective communication.",
+      "color" : "bg-red-500"
+    },
+    {
+      "feature_title": "Send Documents and Files",
+      "feature_description": "Share important documents and files effortlessly within your team, ensuring everyone has access to the necessary resources.",
+      "color" : "bg-emerald-500"
+    },
+    {
+      "feature_title": "Real-Time Collaboration",
+      "feature_description": "Collaborate in real-time with your team, enabling faster decision-making and improved teamwork through instant messaging and file sharing.",
+      "color" : "bg-violet-500"
+    }
+  ]
+}
