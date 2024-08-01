@@ -9,10 +9,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { MdAttachment } from "react-icons/md";
 import { useDropzone } from "@uploadthing/react/hooks";
-import { Progress } from "../ui/progress";
+import { Progress } from "@/components/ui/progress";
 
 function AttachmentModal({
   setAttachment,

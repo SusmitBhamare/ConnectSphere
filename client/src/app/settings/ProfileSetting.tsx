@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { sendModRequest } from "../register/registerClient";
+import { sendModRequest } from "../client/userClient";
 import { toast } from "sonner";
 
 function ProfileSetting() {

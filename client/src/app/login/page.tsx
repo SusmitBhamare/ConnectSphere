@@ -13,7 +13,7 @@ import { loginSchema, LoginSchema } from "@/lib/schemas/loginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { login } from "./loginClient";
+import { login } from "../client/userClient";
 import Link from "next/link";
 import Image from "next/image";
 import "../globals.css";

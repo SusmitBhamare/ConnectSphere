@@ -6,14 +6,14 @@ import {
   DialogFooter,
   DialogTitle,
   DialogTrigger,
-} from "../ui/dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Separator } from "../ui/separator";
-import { Badge } from "../ui/badge";
+} from "@/components/ui/dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { User } from "@/app/types/User";
-import { getMembers, removeMember } from "@/app/chat/workspaceClient";
-import { getUserById } from "@/app/register/registerClient";
-import { Button } from "../ui/button";
+import { getMembers, removeMember } from "../client/workspaceClient";
+import { getUserById } from "../client/userClient";
+import { Button } from "@/components/ui/button";
 import useUserStore from "@/app/zustand/store";
 import { FaTrash } from "react-icons/fa6";
 import { toast } from "sonner";

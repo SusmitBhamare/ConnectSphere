@@ -2,18 +2,15 @@
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { MdArrowRight, MdArrowUpward } from "react-icons/md";
 import { WobbleCard } from "@/components/ui/wobble-card";
 import features from "./data/features.json";
 import {
   FaEnvelope,
   FaGithub,
-  FaSquare,
-  FaSquareGithub,
 } from "react-icons/fa6";
-import { Separator } from "@/components/ui/separator";
-import { BackgroundBeams } from "@/components/ui/background-beans";
+
 
 function HomePage() {
   axios.defaults.withCredentials = true;
@@ -60,7 +57,6 @@ function HomePage() {
           </div>
         </div>
       </footer>
-      <BackgroundBeams/>
     </div>
   );
 }

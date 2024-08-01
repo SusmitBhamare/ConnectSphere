@@ -1,10 +1,10 @@
 import { MessageResponse, Status } from "@/app/types/Message";
 import React from "react";
 import dateFormat from "dateformat";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/avatar";
 import { IoCheckmark, IoCheckmarkDone } from "react-icons/io5";
 import { MdImage } from "react-icons/md";
-import { Button } from "../ui/button";
+import { Button } from "../../components/ui/button";
 import axios from "axios";
 import { toast } from "sonner";
 import { FaFile, FaFilePdf } from "react-icons/fa6";

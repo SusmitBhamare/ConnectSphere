@@ -1,6 +1,9 @@
+import { LoginSchema } from "@/lib/schemas/loginSchema";
 import { SignupSchema } from "@/lib/schemas/signupSchema";
 import axios from "axios"
 import { toast } from "sonner";
+import useUserStore from "../zustand/store";
+import WebSocketService from "../utils/socket";
 
 // Port forwarding Check next.config.js. Done to tackle with cookies not being set in the browser
 const url = 'http://localhost:3000/api/user';
@@ -12,6 +15,30 @@ export async function doesUserExist(username: string) {
     if (axios.isAxiosError(e) && e.response?.status === 404) {
       return false;
     }
+  }
+}
+
+
+export async function login(data: LoginSchema) {
+  try {
+    const response = await axios.post(url + "/auth/login", data);
+    useUserStore.getState().setToken(response.data.token);
+
+    const stompClient = new WebSocketService();
+    stompClient.connect(response.data.token);
+
+    stompClient.onConnected(() => {
+      stompClient.send("/app/users", "");
+      stompClient.subscribe("/topic/connectedUsers", (message) => {
+        console.log(JSON.parse(message.body));
+        useUserStore.getState().setOnlineMembers(JSON.parse(message.body).connectedUsers);
+      })
+      toast.success('Logged in successfully');
+    });
+
+  } catch (e) {
+    console.error(e);
+    toast.error('Invalid credentials');
   }
 }
 
@@ -103,7 +130,7 @@ export async function getModRequests(token: string | undefined | null) {
 }
 
 export async function acceptModRequest(token: string | undefined | null, username: string) {
-  if(!token) throw new Error('Token not found');
+  if (!token) throw new Error('Token not found');
   try {
 
     const response = await axios.put(url + "/admin/accept-mod-request/" + username, {}, {

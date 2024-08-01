@@ -5,7 +5,7 @@ import { MdCheck } from "react-icons/md";
 import { RxCross1 } from "react-icons/rx";
 import { User } from "../types/User";
 import { toast } from "sonner";
-import { acceptModRequest, rejectModRequest } from "../register/registerClient";
+import { acceptModRequest, rejectModRequest } from "../client/userClient";
 import useUserStore from "../zustand/store";
 
 const AcceptRejectButtons = ({

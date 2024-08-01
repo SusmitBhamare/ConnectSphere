@@ -7,7 +7,7 @@ import { signupSchema, SignupSchema } from '@/lib/schemas/signupSchema';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {toast} from 'sonner';
-import { doesUserExist, register } from './registerClient';
+import { doesUserExist, register } from '../client/userClient';
 import Image from 'next/image';
 import { generateQuote } from '../utils/randomQuoteGenerator';
 import register_image from '../../assets/images/register.jpg';

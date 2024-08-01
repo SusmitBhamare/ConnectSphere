@@ -33,7 +33,7 @@ export interface MessageResponse {
   content: string,
   status: string ,
   sender: User,
-  workspaceId: Workspace | undefined,
+  workspace: Workspace | undefined,
   attachment: Attachment | undefined,
   createdAt: Date
   sentAt?: Date

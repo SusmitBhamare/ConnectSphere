@@ -18,5 +18,5 @@ public class UserAllDetailsDTO {
     private Collection<UUID> messagesSent;
     private Collection<UUID> messagesReceived;
     private Collection<Workspace> workspaces;
-    private Collection<UserAllDetailsDTO> usersInteractedWith;
+    private Collection<User> usersInteractedWith;
 }

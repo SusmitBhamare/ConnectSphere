@@ -1,10 +1,11 @@
 "use client";
-import Chat from "@/components/custom/Chat";
-import Sidebar from "@/components/custom/Sidebar";
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Workspace } from "../types/Workspace";
 import useUserStore from "../zustand/store";
 import { User } from "../types/User";
+import Sidebar from "./Sidebar";
+import Chat from "./Chat";
 
 const ChatPage = () => {
   const [selectedChat, setSelectedChat] = useState<Workspace | User | null>(
@@ -12,11 +13,11 @@ const ChatPage = () => {
   );
   const [selectChat, setSelectChat] = useState<boolean>(false);
   const { fetchUser, user } = useUserStore();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const queryParams = new URLSearchParams(window.location.search);
-      const workspaceId = queryParams.get("workspace");
+    const handleLocationChange = () => {
+      const workspaceId = searchParams.get("workspace");
       if (workspaceId) {
         setSelectedChat(
           user?.workspaces.find((workspace) => workspace.id === workspaceId) ||
@@ -25,7 +26,7 @@ const ChatPage = () => {
         setSelectChat(true);
       }
 
-      const userId = queryParams.get("user");
+      const userId = searchParams.get("user");
       if (userId) {
         if (
           user?.usersInteractedWith.find((user) => user.id === userId) ===
@@ -38,15 +39,17 @@ const ChatPage = () => {
         );
         setSelectChat(true);
       }
-    }
-  }, [window.location]);
+    };
+
+    handleLocationChange(); // Call initially to handle the current URL
+  }, [searchParams, user]);
 
   return (
     <div className="max-w-screen h-[90vh] grid grid-cols-4 mt-16">
       <Sidebar
         className={`${
-          selectChat ? "hidden sm:block" : "block"
-        } col-span-4 sm:col-span-1 md:block`}
+          selectChat ? "hidden sm:block" : "flex"
+        } col-span-4 sm:col-span-1 md:flex`}
         selectChat={selectChat}
         setSelectChat={setSelectChat}
         setSelectedChat={setSelectedChat}

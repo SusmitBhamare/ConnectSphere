@@ -3,7 +3,7 @@ import { toast } from "sonner";
 
 
 const workspaceUrl = "http://localhost:8083"
-const messageUrl = "http://localhost:8082"
+
 
 type WorkspaceData = {
   name: string,
@@ -36,7 +36,7 @@ export async function getMembers(workspaceId: string, token: string | undefined 
     })
     return response.data;
   } catch (e) {
-    toast.error('Error fetching members');
+    return null;
   }
 }
 
@@ -81,61 +81,3 @@ export async function deleteWorkspace(workspaceId: string, token: string | undef
   }
 }
 
-
-export async function getMessagesForWorkspace(workspaceId: string, token: string | undefined | null) {
-
-  try {
-    const response = await axios.get(messageUrl + "/messages/workspace/" + workspaceId, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    return response.data;
-  } catch (e) {
-    return null;
-  }
-
-}
-
-export async function getMessagesForUser(senderId: string, receiverId: string, token: string | undefined | null) {
-  try {
-    const response = await axios.get(messageUrl + "/messages/user/" + senderId + "/" + receiverId, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    return response.data;
-  } catch (e) {
-    return null;
-  }
-}
-
-export async function uploadImage(file: File, token: string | undefined | null) {
-  try {
-    const formData = new FormData();
-    formData.append("file", file);
-    const response = await axios.post(messageUrl + "/upload", formData, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-    return response.data;
-
-  } catch (e) {
-    throw new Error("Error uploading image");
-  }
-}
-
-export async function getNotifications(token: string | undefined | null , userId : string){
-  try{
-    const response = await axios.get(messageUrl + "/notifications/" + userId , {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    return response.data;
-  } catch(e){
-    throw new Error("Error fetching notifications");
-  }
-}

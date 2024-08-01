@@ -1,9 +1,9 @@
 "use client"
 import { Workspace } from '@/app/types/Workspace'
 import React, { useState } from 'react'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog'
-import { Button } from '../ui/button';
-import { deleteWorkspace } from '@/app/chat/workspaceClient';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../../components/ui/alert-dialog'
+import { Button } from '../../components/ui/button';
+import { deleteWorkspace } from '../client/workspaceClient';
 import { toast } from 'sonner';
 import useUserStore from '@/app/zustand/store';
 

@@ -1,24 +1,25 @@
 "use client";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import React, { useCallback, useEffect, useState } from "react";
-import { Input } from "../ui/input";
+import { Input } from "@/components/ui/input";
 import WorkspaceModel from "./WorkspaceModel";
 import ChatSkeleton from "./ChatSkeleton";
 import useUserStore from "@/app/zustand/store";
 import { Workspace } from "@/app/types/Workspace";
 import { useRouter } from "next/navigation";
 import { User } from "@/app/types/User";
-import { getUser, getUserById } from "@/app/register/registerClient";
+import { getUser } from "../client/userClient";
 import { debounce } from "lodash";
 import { MessageResponse } from "@/app/types/Message";
-import { getMessagesForUser } from "@/app/chat/workspaceClient";
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../ui/context-menu";
+import { getMessagesForUser } from "../client/messageClient";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 import { cn } from "@/lib/utils";
-import { Sheet, SheetTrigger } from "../ui/sheet";
 
-interface LastMessage {
-  [key: string]: string;
-}
 
 function Sidebar({
   selectChat,

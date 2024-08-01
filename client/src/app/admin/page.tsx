@@ -2,7 +2,7 @@ import React from "react";
 import { getCurrentUser, getToken } from "../utils/jwtUtil";
 import { redirect } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getModRequests } from "../register/registerClient";
+import { getModRequests } from "../client/userClient";
 import { User } from "../types/User";
 import {
   Table,

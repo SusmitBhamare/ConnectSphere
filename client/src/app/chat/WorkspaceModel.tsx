@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { HiPlusCircle } from "react-icons/hi2";
 import {
   Command,
@@ -29,22 +29,22 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "../ui/input";
+import { Input } from "@/components/ui/input";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   workspaceSchema,
   WorkspaceSchema,
 } from "@/lib/schemas/createWorkspaceSchema";
-import { Separator } from "../ui/separator";
-import { Textarea } from "../ui/textarea";
+import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
-import { getUser } from "@/app/register/registerClient";
+import { getUser } from "../client/userClient";
 import { useCallback } from "react";
 import { debounce } from "lodash";
-import { Label } from "../ui/label";
+import { Label } from "@/components/ui/label";
 import { FaTrash } from "react-icons/fa6";
-import { createWorkspace } from "@/app/chat/workspaceClient";
+import { createWorkspace } from "../client/workspaceClient";
 import { User } from "@/app/types/User";
 import useUserStore from "@/app/zustand/store";
 import { toast } from "sonner";

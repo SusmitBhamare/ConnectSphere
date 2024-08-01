@@ -5,8 +5,8 @@ import {
   DialogContent,
   DialogTitle,
   DialogTrigger,
-} from "../ui/dialog";
-import { Button } from "../ui/button";
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -15,13 +15,13 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "../ui/command";
+} from "@/components/ui/command";
 import { User } from "@/app/types/User";
 import { debounce, set } from "lodash";
-import { getUser } from "@/app/register/registerClient";
+import { getUser } from "../client/userClient";
 import useUserStore from "@/app/zustand/store";
 import { FaTrash } from "react-icons/fa6";
-import { addMembers, getMembers } from "@/app/chat/workspaceClient";
+import { addMembers, getMembers } from "../client/workspaceClient";
 import { toast } from "sonner";
 
 function AddMemberToWorkspace({ workspaceId , setMembers ,  members }: { workspaceId : string | undefined , setMembers: (members : User[]) => void , members: User[] }) {

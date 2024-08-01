@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect } from "react";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { FaBarsStaggered } from "react-icons/fa6";
 import {
   Sheet,
@@ -9,16 +9,14 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "../ui/sheet";
-import Home from "./Home";
-import { getToken } from "@/app/utils/jwtUtil";
+} from "@/components/ui/sheet";
 import Link from "next/link";
 import useUserStore from "@/app/zustand/store";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import axios from "axios";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Separator } from "../ui/separator";
+import { Separator } from "@/components/ui/separator";
 
 function ResponsiveNavbar() {
   const { token, user, fetchUser } = useUserStore();

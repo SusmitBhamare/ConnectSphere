@@ -6,17 +6,17 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import { Button } from "../ui/button";
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { BsBellFill } from "react-icons/bs";
 import useUserStore from "@/app/zustand/store";
-import { addUsersInteracted } from "@/app/register/registerClient";
+import { addUsersInteracted } from "../client/userClient";
 import { MessageResponse } from "@/app/types/Message";
 import { useRouter } from "next/navigation";
-import { Separator } from "../ui/separator";
-import { getNotifications } from "@/app/chat/workspaceClient";
+import { Separator } from "@/components/ui/separator";
+import { getNotifications } from "../client/messageClient";
 import { toast } from "sonner";
-import { MdAttachFile, MdFileCopy, MdImage } from "react-icons/md";
+import { MdFileCopy, MdImage } from "react-icons/md";
 
 const Notifications = () => {
   const router = useRouter();

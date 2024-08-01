@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import React, { useEffect, useState } from "react";
-import { Button } from "../ui/button";
+import { Button } from "../../components/ui/button";
 import { RiSendPlaneFill } from "react-icons/ri";
 import {
   Tooltip,
@@ -8,7 +8,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "../../components/ui/avatar";
 import WorkspaceMember from "./WorkspaceMember";
 import useUserStore from "@/app/zustand/store";
 import { Workspace } from "@/app/types/Workspace";
@@ -18,17 +22,17 @@ import { Message, MessageResponse, Status } from "@/app/types/Message";
 import {
   getMessagesForUser,
   getMessagesForWorkspace,
-} from "@/app/chat/workspaceClient";
+} from "../client/messageClient";
 import MessageBubble from "./MessageBubble";
 import { User } from "@/app/types/User";
 import AttachmentModal from "./AttachmentModal";
-import { Badge } from "../ui/badge";
+import { Badge } from "../../components/ui/badge";
 import { MdArrowBack, MdClose, MdImage } from "react-icons/md";
 import { FaFile, FaFilePdf, FaSpinner } from "react-icons/fa6";
 import { toast } from "sonner";
 import { useUploadThing } from "@/app/utils/uploadthing";
 import { isWorkspace } from "@/app/utils/typeUtil";
-import { Textarea } from "../ui/textarea";
+import { Textarea } from "../../components/ui/textarea";
 
 function Chat({
   setSelectChat,
@@ -103,14 +107,15 @@ function Chat({
       }
     );
 
-    return () => {
-      if (stompClient) {
-        stompClient.disconnect(() => {
-          console.log("Disconnected");
-        });
-      }
-    };
+    // return () => {
+    //   if (stompClient) {
+    //     stompClient.disconnect(() => {
+    //       console.log("Disconnected");
+    //     });
+    //   }
+    // };
   }, [selectedChat, cookie]);
+
 
   useEffect(() => {
     if (!stompClient) return;
@@ -139,7 +144,7 @@ function Chat({
         }
         if (
           isWorkspace(selectedChat) &&
-          messageResponse.workspaceId?.id !== selectedChat.id
+          messageResponse.workspace?.id !== selectedChat.id
         ) {
           setNotifications([...notifications, messageResponse]);
           return;
@@ -221,7 +226,7 @@ function Chat({
   };
 
   return (
-    <div className={cn(className, "min-h-full relative")}>
+    <div className={cn(className, "max-h-full relative")}>
       {selectedChat ? (
         <div>
           <div className="shadow-2xl border-b-2 border-zinc-600/5 py-4 px-4 flex gap-1 items-center">
@@ -263,7 +268,7 @@ function Chat({
           ) : (
             <div
               ref={scrollRef}
-              className="max-h-[36rem] md:max-h-[29rem] lg:max-h-[36rem] rounded-md overflow-y-auto "
+              className="max-h-[68vh] rounded-md overflow-y-auto "
             >
               <div className="flex flex-col px-4">
                 {messages.map((message, index) => (
@@ -276,7 +281,7 @@ function Chat({
               </div>
             </div>
           )}
-          <div className="absolute w-full bottom-0 z-10">
+          <div className="absolute w-full py-4 bottom-0 z-10">
             <div className="flex items-center justify-between px-4 py-2 rounded-b-lg">
               <div className="relative w-full">
                 <Textarea
@@ -310,7 +315,7 @@ function Chat({
                   </div>
                 )}
                 <span
-                  className={`absolute text-xs -top-5 left-0 ${
+                  className={`absolute text-xs -bottom-5 left-0 ${
                     alertUser ? "text-destructive" : "text-muted-foreground"
                   }`}
                 >

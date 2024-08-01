@@ -74,10 +74,10 @@ public class UserServiceImpl implements UserService {
   @Override
   public UserAllDetailsDTO getUserByUsername(String username) {
     User user = userRepository.findByUsername(username).orElse(null);
-    return userToUserAllDetailsDTO(user);
+    return userToUserAllDetailsDTO(user, new HashSet<>() );
   }
 
-  public UserAllDetailsDTO userToUserAllDetailsDTO(User user) {
+  public UserAllDetailsDTO userToUserAllDetailsDTO(User user, Set<UUID> visited) {
     UserAllDetailsDTO userAllDetailsDTO = new UserAllDetailsDTO();
     userAllDetailsDTO.setId(user.getId());
     userAllDetailsDTO.setName(user.getName());
@@ -86,11 +86,17 @@ public class UserServiceImpl implements UserService {
     userAllDetailsDTO.setRole(user.getRole());
     userAllDetailsDTO.setUsername(user.getUsername());
     userAllDetailsDTO.setWorkspaces(new ArrayList<>());
+
+    visited.add(user.getId());
+
     for (UUID workspaceId : user.getWorkspaces()) {
       userAllDetailsDTO.getWorkspaces().add(workspaceClient.getWorkspaceById(workspaceId));
     }
     userAllDetailsDTO.setUsersInteractedWith(new ArrayList<>());
     for (UUID userId : user.getUsersInteractedWith()) {
+      if (visited.contains(userId)) {
+        continue;
+      }
       User interactedUser = userRepository.findById(userId).orElse(null);
       if (interactedUser == null) {
         continue;
@@ -109,7 +115,7 @@ public class UserServiceImpl implements UserService {
     if(user == null){
       throw new IllegalArgumentException("User not found");
     }
-    return userToUserAllDetailsDTO(user);
+    return userToUserAllDetailsDTO(user,new HashSet<>());
   }
 
   @Override
@@ -154,7 +160,7 @@ public class UserServiceImpl implements UserService {
     if(modRequestRedisService.hasModRequest(userDetails.getUsername())){
       throw new IllegalArgumentException("Mod request already sent");
     }
-    modRequestRedisService.storeModRequest(userDetails.getUsername(), userToUserAllDetailsDTO(user));
+    modRequestRedisService.storeModRequest(userDetails.getUsername(), userToUserAllDetailsDTO(user, new HashSet<>() ));
     return "Mod request sent";
   }
 
