@@ -1,5 +1,5 @@
 "use client";
-import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import React, { useCallback, useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import WorkspaceModel from "./WorkspaceModel";
@@ -10,34 +10,70 @@ import { useRouter } from "next/navigation";
 import { User } from "@/app/types/User";
 import { getUser, getUserById } from "@/app/register/registerClient";
 import { debounce } from "lodash";
+import { MessageResponse } from "@/app/types/Message";
+import { getMessagesForUser } from "@/app/chat/workspaceClient";
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../ui/context-menu";
+import { cn } from "@/lib/utils";
+import { Sheet, SheetTrigger } from "../ui/sheet";
+
+interface LastMessage {
+  [key: string]: string;
+}
 
 function Sidebar({
+  selectChat,
+  setSelectChat,
   selectedChat,
   setSelectedChat,
+  className
 }: {
+  selectChat : boolean,
+  setSelectChat: (selectChat: boolean) => void;
   selectedChat: Workspace | User | null;
   setSelectedChat: (workspace: Workspace | User) => void;
+  className?: string;
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [workspaceCreated, setWorkspaceCreated] = useState(false);
-  const [isActive, setisActive] = useState<string>("");
-  const { fetchUser, user, token } = useUserStore();
+  const [isActive, setIsActive] = useState<string>("");
+  const { fetchUser, user, token, onlineMembers } = useUserStore();
   const [searchUser, setSearchUser] = useState<string>("");
   const [searchedUser, setSearchedUser] = useState<User | null>(null);
+  const [lastMessages, setLastMessages] = useState<Record<string, string>>({});
   const router = useRouter();
+
+  const handleGetLastMessage = async (userId: string) => {
+    if (!user) return;
+    const res: MessageResponse[] = await getMessagesForUser(
+      user.id,
+      userId,
+      token
+    );
+    if (res) {
+      res.forEach((message) => {
+        message.createdAt = new Date(message.createdAt);
+      });
+      res.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      const lastMessage = res.length > 0 ? res[0].content : "";
+      setLastMessages((prevMessages) => ({
+        ...prevMessages,
+        [userId]: lastMessage,
+      }));
+    }
+  };
 
   const debouncedResults = useCallback(
     debounce(async (username: string) => {
       const result = await getUser(username, token ? token : "");
       if (result) {
-        if (result.username === username && username !== user?.username) {       
+        if (result.username === username && username !== user?.username) {
           setSearchedUser(result);
         }
       } else {
         setSearchedUser(null);
       }
     }, 500),
-    []
+    [token, user]
   );
 
   const searchUserHandler = async (username: string) => {
@@ -49,30 +85,40 @@ function Sidebar({
     }
   };
 
-  const handleSelectChat = (workspaceId: String, workspace: Workspace) => {
+  const handleSelectChat = (workspaceId: string, workspace: Workspace) => {
     setSelectedChat(workspace);
     router.push("?workspace=" + workspaceId, { scroll: false });
+    setSelectChat(true);
   };
 
-  const handleUserChat = (userId: String, user: User) => {
+  const handleUserChat = (userId: string, user: User) => {
     setSelectedChat(user);
     router.push("?user=" + userId, { scroll: false });
+    setSelectChat(true);
   };
 
   useEffect(() => {
     if (selectedChat && selectedChat.id !== isActive) {
-      setisActive(selectedChat.id);
+      setIsActive(selectedChat.id);
     }
   }, [selectedChat, isActive]);
 
+  useEffect(() => {
+    if (user?.usersInteractedWith && user.usersInteractedWith.length > 0) {
+      user.usersInteractedWith.forEach((u) => handleGetLastMessage(u.id));
+    }
+    if (searchedUser) {
+      handleGetLastMessage(searchedUser.id);
+    }
+  }, [user, searchedUser]);
 
   useEffect(() => {
     fetchUser();
     setIsLoading(false);
-  }, [workspaceCreated]);
+  }, [workspaceCreated, fetchUser]);
 
   return (
-    <div className="flex flex-col min-h-full w-full justify-between items-center  shadow-lg">
+    <div className={cn("flex flex-col min-h-full w-full justify-between items-center shadow-lg" , className)}>
       <div className="flex flex-col w-full items-center">
         <Input
           value={searchUser}
@@ -82,12 +128,21 @@ function Sidebar({
           placeholder="Search for users or workspaces"
         />
         {searchedUser && (
-          <UserChat user={searchedUser} isActive={isActive === searchedUser.id} />
+          <UserChat
+            lastMessage={lastMessages[searchedUser.id]}
+            user={searchedUser}
+            isActive={isActive === searchedUser.id}
+          />
         )}
 
-        {user?.usersInteractedWith.map((user) => {
-          return <UserChat user={user} isActive={isActive === user.id} />;
-        })}
+        {user?.usersInteractedWith.map((user) => (
+          <UserChat
+            key={user.id}
+            user={user}
+            lastMessage={lastMessages[user.id]}
+            isActive={isActive === user.id}
+          />
+        ))}
 
         {isLoading && (
           <div>
@@ -101,8 +156,9 @@ function Sidebar({
         {user?.workspaces &&
           user.workspaces.map((workspace: Workspace) => (
             <WorkspaceChat
+              key={workspace.id}
               workspace={workspace}
-              isActive={isActive === workspace?.id}
+              isActive={isActive === workspace.id}
             />
           ))}
       </div>
@@ -133,42 +189,71 @@ function Sidebar({
           <AvatarImage
             className="rounded-full w-8"
             src={workspace?.image}
-            alt="@shadcn"
+            alt={workspace.name}
           />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <div>
           <h1>{workspace?.name}</h1>
           <p className="text-muted-foreground text-xs">
-            Sounds good ! Thank you
+            Sounds good! Thank you
           </p>
         </div>
       </div>
     );
   }
 
-  function UserChat({ user, isActive }: { user: User; isActive: boolean }) {
+  function UserChat({
+    user,
+    isActive,
+    lastMessage,
+  }: {
+    user: User;
+    isActive: boolean;
+    lastMessage?: string;
+  }) {
     return (
-      <div
-        onClick={() => {
-            handleUserChat(user?.id, user);
-        }}
-        className={`${
-          isActive ? "bg-primary/30" : "bg-zinc-900"
-        } h-max w-full flex flex-row items-center px-4 gap-3 py-2`}
-      >
-        <Avatar className="rounded-full ring ring-primary/50">
-          <AvatarImage
-            className="rounded-full w-8"
-            src={user.image ? user.image : ""}
-            alt="@shadcn"
-          />
-          <AvatarFallback>{user.name.toUpperCase()[0] + user.name.toUpperCase()[2]}</AvatarFallback>
-        </Avatar>
-        <div>
-          <h1>{user.name}</h1>
-        </div>
-      </div>
+      <ContextMenu>
+        <ContextMenuTrigger asChild>
+          <div
+            onClick={() => {
+              handleUserChat(user.id, user);
+            }}
+            className={`${
+              isActive ? "bg-primary/30" : "bg-zinc-950"
+            } h-max w-full flex flex-row items-center px-4 gap-3 py-2 relative`}
+          >
+            <div className="relative">
+              <Avatar className="ring-1 ring-primary/20">
+                <AvatarImage
+                  src={user.image ? user.image : ""}
+                  alt={user.name}
+                />
+                <AvatarFallback>
+                  {user.name.toUpperCase()[0] + user.name.toUpperCase()[1]}
+                </AvatarFallback>
+              </Avatar>
+              <div
+                className={`absolute bottom-0 left-1 w-2 border-0.5 border-primary h-2 rounded-full ${
+                  onlineMembers?.includes(user.username)
+                    ? "bg-green-600"
+                    : "bg-red-600"
+                }`}
+              ></div>
+            </div>
+            <div>
+              <h1>{user.name}</h1>
+              {lastMessage && (
+                <p className="text-muted-foreground text-sm">{lastMessage}</p>
+              )}
+            </div>
+          </div>
+        </ContextMenuTrigger>
+        <ContextMenuContent>
+          <ContextMenuItem>Delete Chat</ContextMenuItem>
+          <ContextMenuItem>Clear Chat</ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
     );
   }
 }

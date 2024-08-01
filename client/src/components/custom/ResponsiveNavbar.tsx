@@ -74,7 +74,7 @@ function ResponsiveNavbar() {
             ) : (
               <div className="flex flex-col items-center justify-center gap-6">
                 <div className="flex flex-col items-center justify-center gap-2">
-                <Avatar>
+                <Avatar className="ring-1 ring-primary/20">
                   <AvatarImage src={user?.image ?? ""} />
                   <AvatarFallback>{user?.name.toUpperCase()[0]}</AvatarFallback>
                 </Avatar>

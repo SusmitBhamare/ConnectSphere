@@ -1,6 +1,6 @@
 package com.gather.user.controller;
 
-import com.gather.user.service.impl.RedisService;
+import com.gather.user.service.impl.TokenRedisService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
    
   private final AuthService authService;
-  private final RedisService redisService;
+  private final TokenRedisService redisService;
 
   @PostMapping("/register")
   public ResponseEntity<User> register(@RequestBody UserRegisterDTO userRegisterDTO){

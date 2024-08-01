@@ -2,7 +2,6 @@ package com.gather.user.service.impl;
 
 import com.gather.user.entity.Role;
 
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,7 +29,7 @@ public class AuthServiceImpl implements AuthService{
   private final PasswordEncoder passwordEncoder;
   private final AuthenticationManager authenticationManager;
   private final JWTService jwtService;
-  private final RedisService redisService;
+  private final TokenRedisService redisService;
 
 
   @Override

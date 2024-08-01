@@ -1,16 +1,43 @@
 package com.gather.user.controller;
 
+import com.gather.user.dto.UserAllDetailsDTO;
+import com.gather.user.service.AdminService;
+import com.gather.user.service.AuthService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequestMapping("/admin")
 @RestController
+@RequiredArgsConstructor
 public class AdminController {
-  
-  @GetMapping("/test")
-  public ResponseEntity<String> test() {
-    return ResponseEntity.ok("Admin Controller Test");
+
+  private final AdminService adminService;
+
+  @GetMapping("/mod-requests")
+  public ResponseEntity<List<UserAllDetailsDTO>> getModRequests() {
+    return adminService.getModRequests();
+  }
+
+  @PutMapping("/accept-mod-request/{username}")
+  public ResponseEntity<String> acceptModRequest(@PathVariable String username) {
+    try{
+      adminService.acceptModRequest(username);
+      return ResponseEntity.ok("Mod request accepted");
+    }catch (Exception e){
+      return ResponseEntity.badRequest().body(e.getMessage());
+    }
+  }
+
+  @DeleteMapping("/reject-mod-request/{username}")
+  public ResponseEntity<String> rejectModRequest(@PathVariable String username) {
+    try{
+      adminService.rejectModRequest(username);
+      return ResponseEntity.ok("Mod request rejected");
+    }catch (Exception e){
+      return ResponseEntity.badRequest().body(e.getMessage());
+    }
   }
 }

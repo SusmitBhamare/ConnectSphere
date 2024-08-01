@@ -5,13 +5,26 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MdEdit } from "react-icons/md";
+import { sendModRequest } from "../register/registerClient";
+import { toast } from "sonner";
 
 function ProfileSetting() {
-  const { user, fetchUser } = useUserStore();
+  const { token, user, fetchUser } = useUserStore();
   useEffect(() => {
     fetchUser();
   }, []);
+
+   const handleRequestMod = async () => {
+    if(!user) return;
+
+    sendModRequest(token).then((res) => {
+      toast.success(res);
+    }).catch((err) => {
+      toast.error(err.message);
+    })
+    
+  }
+
   return (
     <div className="h-full px-16 py-2">
       <h1 className="text-xl md:text-2xl font-primary">Profile Settings</h1>
@@ -45,7 +58,7 @@ function ProfileSetting() {
           </div>
           <div className="flex w-full gap-2">
             {user?.role === "USER" && (
-              <Button className="w-full">Request for Mod</Button>
+              <Button onClick={()=>handleRequestMod()} className="w-full">Request for Mod</Button>
             )}
             <Button className="w-full" variant={"secondary"}>
               Edit

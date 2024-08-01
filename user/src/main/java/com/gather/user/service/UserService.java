@@ -1,6 +1,7 @@
 package com.gather.user.service;
 
 import com.gather.user.dto.UserAllDetailsDTO;
+import com.gather.user.dto.WorkspaceDTO;
 import com.gather.user.dummy.Workspace;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,5 +25,7 @@ public interface UserService {
   void removeUserFromWorkspace(UUID userId, UUID workspaceId);
 
   void addUsersInteracted(UUID userId, UUID receiverId);
+
+  String modRequest(UserDetails userDetails);
 }
 

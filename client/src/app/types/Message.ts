@@ -35,7 +35,7 @@ export interface MessageResponse {
   sender: User,
   workspaceId: Workspace | undefined,
   attachment: Attachment | undefined,
-  createdAt: Date | undefined
+  createdAt: Date
   sentAt?: Date
 }
 

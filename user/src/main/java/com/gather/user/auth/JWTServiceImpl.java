@@ -2,10 +2,9 @@ package com.gather.user.auth;
 
 import java.security.Key;
 import java.util.Date;
-import java.util.Map;
 import java.util.function.Function;
 
-import com.gather.user.service.impl.RedisService;
+import com.gather.user.service.impl.TokenRedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,11 +21,11 @@ import io.jsonwebtoken.security.Keys;
 @RequiredArgsConstructor
 public class JWTServiceImpl implements JWTService{
 
-  private final RedisService redisService;
+  private final TokenRedisService redisService;
   @Value("${jwt.secret}")
   private String secret;
 
-  private final RedisService service;
+  private final TokenRedisService service;
 
   private static final long JWT_EXPIRATION = 1000 * 60 * 60 * 10; // 10 hours
 

@@ -74,3 +74,59 @@ export async function addUsersInteracted(token: string | undefined | null, userI
   }
 }
 
+
+export async function sendModRequest(token: string | undefined | null) {
+  try {
+    const response = await axios.post(url + "/user/mod-request", {}, {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    })
+    return response.data;
+  } catch (e: any) {
+    throw new Error(e.response.data);
+  }
+}
+
+
+export async function getModRequests(token: string | undefined | null) {
+  try {
+    const response = await axios.get(url + "/admin/mod-requests", {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    })
+    return response.data;
+  } catch (e: any) {
+    throw new Error(e.response.data);
+  }
+}
+
+export async function acceptModRequest(token: string | undefined | null, username: string) {
+  if(!token) throw new Error('Token not found');
+  try {
+
+    const response = await axios.put(url + "/admin/accept-mod-request/" + username, {}, {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    })
+    return response.data;
+  } catch (e: any) {
+    throw new Error(e.response.data);
+  }
+}
+
+export async function rejectModRequest(token: string | undefined | null, username: string) {
+  if (!token) throw new Error('Token not found');
+  try {
+    const response = await axios.delete(url + "/admin/reject-mod-request/" + username, {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    })
+    return response.data;
+  } catch (e: any) {
+    throw new Error(e.response.data);
+  }
+}

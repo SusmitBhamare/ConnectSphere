@@ -15,7 +15,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { BackgroundBeams } from "@/components/ui/background-beans";
 
-function page() {
+function HomePage() {
   axios.defaults.withCredentials = true;
 
   return (
@@ -79,7 +79,7 @@ const Hero = () => {
         <Button
           size={"lg"}
           variant={"secondary"}
-          className="flex gap-2 items-center group"
+          className="flex gap-2 z-10 items-center group"
           asChild
         >
           <Link href={"/register"}>
@@ -87,7 +87,7 @@ const Hero = () => {
             <MdArrowUpward className="group-hover:rotate-90 transition-all delay-150" />
           </Link>
         </Button>
-        <Button size={"lg"} variant={"default"}>
+        <Button size={"lg"} variant={"default"} className="z-10">
           View Demo
         </Button>
       </div>
@@ -110,4 +110,4 @@ const Features = () => {
   );
 };
 
-export default page;
+export default HomePage;

@@ -3,7 +3,7 @@ import { isLoggedIn } from "../utils/jwtUtil";
 import { redirect } from "next/navigation";
 import ChatPage from "./ChatPage";
 
-function page() {
+function ChatHomePage() {
   if (!isLoggedIn()) {
     redirect("/login");
   }
@@ -12,4 +12,4 @@ function page() {
   );
 }
 
-export default page;
+export default ChatHomePage;

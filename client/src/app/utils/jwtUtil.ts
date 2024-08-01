@@ -15,3 +15,19 @@ export function getToken() {
   const token = cookieStore.get('token');
   return token;
 }
+
+
+export async function getCurrentUser(token : string | undefined) {
+  if(!token) return null;
+  try {
+    const response = await axios.get(url + "/profile", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    });
+
+    return response.data;
+  } catch (e) {
+    return null;
+  }
+}

@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
 import React, { useEffect, useState } from "react";
-import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { RiSendPlaneFill } from "react-icons/ri";
 import {
@@ -9,35 +8,36 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import WorkspaceMember from "./WorkspaceMember";
 import useUserStore from "@/app/zustand/store";
 import { Workspace } from "@/app/types/Workspace";
 import SockJS from "sockjs-client";
 import { CompatClient, Stomp } from "@stomp/stompjs";
 import { Message, MessageResponse, Status } from "@/app/types/Message";
-import { ScrollArea } from "../ui/scroll-area";
 import {
   getMessagesForUser,
   getMessagesForWorkspace,
-  uploadImage as uploadFile,
 } from "@/app/chat/workspaceClient";
 import MessageBubble from "./MessageBubble";
 import { User } from "@/app/types/User";
 import AttachmentModal from "./AttachmentModal";
 import { Badge } from "../ui/badge";
-import { MdClose, MdFileCopy, MdImage } from "react-icons/md";
+import { MdArrowBack, MdClose, MdImage } from "react-icons/md";
 import { FaFile, FaFilePdf, FaSpinner } from "react-icons/fa6";
 import { toast } from "sonner";
 import { useUploadThing } from "@/app/utils/uploadthing";
 import { isWorkspace } from "@/app/utils/typeUtil";
-import { set } from "react-hook-form";
 import { Textarea } from "../ui/textarea";
 
 function Chat({
+  setSelectChat,
+  selectChat,
   className,
   selectedChat,
 }: {
+  setSelectChat: (selectChat: boolean) => void;
+  selectChat: boolean;
   className?: string;
   selectedChat: Workspace | User | null;
 }) {
@@ -46,7 +46,7 @@ function Chat({
   const [attachment, setAttachment] = useState<File | null>(null);
   const [messages, setMessages] = useState<MessageResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [alertUser , setAlertUser] = useState<boolean>(false);
+  const [alertUser, setAlertUser] = useState<boolean>(false);
   const [isSending, setIsSending] = useState<boolean>(false);
   const cookie = useUserStore((state) => state.token); // Assuming this fetches the token correctly
   const { fetchUser, user, notifications, setNotifications } = useUserStore();
@@ -212,36 +212,49 @@ function Chat({
   };
 
   const handleMessageInput = (value: string) => {
-    if(value.length > 200){
+    if (value.length > 200) {
       setAlertUser(true);
-    } else{
+    } else {
       setAlertUser(false);
     }
     setMessageInput(value);
-  }
+  };
 
   return (
     <div className={cn(className, "min-h-full relative")}>
       {selectedChat ? (
         <div>
-          <div className="shadow-2xl border-b-2 border-zinc-600/5 py-4 px-4 flex gap-5">
-            <Avatar className="rounded-full ring ring-primary/50">
-              <AvatarImage
-                className="rounded-full h-16 w-16"
-                src={selectedChat.image ? selectedChat.image : ""}
-                alt={selectedChat.name} // Assuming selectedChat has 'image' and 'name' properties
-              />
-              <AvatarFallback>
-                {selectedChat.name.toLocaleUpperCase()[0]}
-              </AvatarFallback>
-            </Avatar>
-            {isWorkspace(selectedChat) ? (
-              <WorkspaceMember workspace={selectedChat} />
-            ) : (
-              <h1 className="font-primary text-lg cursor-pointer">
-                {selectedChat?.name}
-              </h1>
-            )}
+          <div className="shadow-2xl border-b-2 border-zinc-600/5 py-4 px-4 flex gap-1 items-center">
+            <Button
+              variant={"ghost"}
+              className="md:hidden flex justify-center"
+              onClick={() => setSelectChat(false)}
+              size={"icon"}
+            >
+              <MdArrowBack />
+            </Button>
+            <div className="flex gap-4 items-center">
+              <Avatar className="rounded-full">
+                <AvatarImage
+                  className="rounded-full"
+                  width={35}
+                  height={35}
+                  src={selectedChat.image ? selectedChat.image : ""}
+                  alt="@shadcn" // Assuming selectedChat has 'image' and 'name' properties
+                />
+                <AvatarFallback className="ring-2 rounded-full p-1.5">
+                  {selectedChat.name.toLocaleUpperCase()[0] +
+                    selectedChat.name.toLocaleUpperCase()[1]}
+                </AvatarFallback>
+              </Avatar>
+              {isWorkspace(selectedChat) ? (
+                <WorkspaceMember workspace={selectedChat} />
+              ) : (
+                <h1 className="font-primary text-lg cursor-pointer">
+                  {selectedChat?.name}
+                </h1>
+              )}
+            </div>
           </div>
           {loading ? (
             <div className="text-center mt-32 text-muted-foreground">
@@ -250,7 +263,7 @@ function Chat({
           ) : (
             <div
               ref={scrollRef}
-              className="h-[29rem] rounded-md overflow-y-auto "
+              className="max-h-[36rem] md:max-h-[29rem] lg:max-h-[36rem] rounded-md overflow-y-auto "
             >
               <div className="flex flex-col px-4">
                 {messages.map((message, index) => (
@@ -263,15 +276,17 @@ function Chat({
               </div>
             </div>
           )}
-          <div className="absolute w-full bottom-0">
+          <div className="absolute w-full bottom-0 z-10">
             <div className="flex items-center justify-between px-4 py-2 rounded-b-lg">
               <div className="relative w-full">
                 <Textarea
-                rows={2}
+                  rows={2}
                   placeholder="Send a message"
                   value={messageInput}
                   onChange={(e) => handleMessageInput(e.target.value)}
-                  className={`relative ${attachment ? "h-12" : ""} text-wrap resize-none`}
+                  className={`relative ${
+                    attachment ? "h-12" : ""
+                  } text-wrap resize-none`}
                 />
                 {attachment && (
                   <div className="absolute top-1/2 right-3 transform -translate-y-1/2 ">
@@ -294,7 +309,13 @@ function Chat({
                     </Badge>
                   </div>
                 )}
-                <span className={`absolute text-xs -top-5 left-0 ${alertUser ? 'text-destructive' : 'text-muted-foreground' }`}>{messageInput.length}/200 characters</span>
+                <span
+                  className={`absolute text-xs -top-5 left-0 ${
+                    alertUser ? "text-destructive" : "text-muted-foreground"
+                  }`}
+                >
+                  {messageInput.length}/200 characters
+                </span>
               </div>
               <div className="flex gap-2 items-center px-3">
                 <AttachmentModal
@@ -304,7 +325,10 @@ function Chat({
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button disabled={isSending || alertUser} onClick={sendMessage}>
+                      <Button
+                        disabled={isSending || alertUser}
+                        onClick={sendMessage}
+                      >
                         {isSending ? (
                           <FaSpinner className="animate-spin" />
                         ) : (

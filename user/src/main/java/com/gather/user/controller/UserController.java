@@ -1,12 +1,10 @@
 package com.gather.user.controller;
 
 
-import com.gather.user.dto.WorkspaceDTO;
+
 import com.gather.user.dummy.Workspace;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,12 +26,14 @@ public class UserController {
     return ResponseEntity.ok(userService.getWorkspaces(userDetails));
   }
 
-
-
-  @GetMapping("/test")
-    public ResponseEntity<String> test(){
-        return ResponseEntity.ok("Test");
+  @PostMapping("/mod-request")
+  public ResponseEntity<String> modRequest(@AuthenticationPrincipal UserDetails userDetails){
+    try{
+      return ResponseEntity.ok(userService.modRequest(userDetails));
+    } catch (Exception e){
+      return ResponseEntity.badRequest().body(e.getMessage());
     }
+  }
   
 
 }

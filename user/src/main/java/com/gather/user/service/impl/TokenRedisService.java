@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class RedisService {
+public class TokenRedisService {
 
     private final StringRedisTemplate redisTemplate;
 

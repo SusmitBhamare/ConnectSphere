@@ -21,6 +21,8 @@ import java.util.*;
 public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
   private final WorkspaceClient workspaceClient;
+  private final TokenRedisService redisService;
+  private final ModRequestRedisService modRequestRedisService;
 
   @Override
   public UserDetailsService userDetailsService() {
@@ -141,6 +143,19 @@ public class UserServiceImpl implements UserService {
     usersInteracted.add(receiverId);
     user.setUsersInteractedWith(usersInteracted);
     userRepository.save(user);
+  }
+
+  @Override
+  public String modRequest(UserDetails userDetails) {
+    User user = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
+    if(user == null){
+      throw new IllegalArgumentException("User not found");
+    }
+    if(modRequestRedisService.hasModRequest(userDetails.getUsername())){
+      throw new IllegalArgumentException("Mod request already sent");
+    }
+    modRequestRedisService.storeModRequest(userDetails.getUsername(), userToUserAllDetailsDTO(user));
+    return "Mod request sent";
   }
 
 }

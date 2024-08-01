@@ -50,13 +50,15 @@ const MessageBubble = ({
         isUser ? "self-end flex-row-reverse" : "self-start"
       }`}
     >
-      <Avatar className="rounded-full ring ring-primary/50">
+      <Avatar className="rounded-full">
         <AvatarImage
-          className="rounded-full w-8"
           src={message.sender.image || ""}
           alt="@shadcn"
         />
-        <AvatarFallback>CN</AvatarFallback>
+        <AvatarFallback className="ring-2 rounded-full p-1.5">
+          {message.sender.name.toLocaleUpperCase()[0] +
+            message.sender.name.toLocaleUpperCase()[1]}
+        </AvatarFallback>
       </Avatar>
       <div className="my-2 w-52 rounded-lg py-1">
         <div className="px-2 py-0.1">
@@ -81,11 +83,9 @@ const MessageBubble = ({
               <div className="flex gap-2 w-full items-center font-semibold p-2">
                 {message.attachment.type.startsWith("image") ? (
                   <MdImage className="w-5 h-5" />
-                ) :
-                message.attachment.type.startsWith("pdf") ? (
+                ) : message.attachment.type.startsWith("pdf") ? (
                   <FaFilePdf className="w-5 h-5" />
-                )               
-                : (
+                ) : (
                   <FaFile className="w-5 h-5" />
                 )}
                 <p

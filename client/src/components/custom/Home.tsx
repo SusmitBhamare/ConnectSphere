@@ -6,7 +6,6 @@ import axios from "axios";
 import { redirect, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import useUserStore from "@/app/zustand/store";
-import WebSocketService from "@/app/utils/socket";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "../ui/dropdown-menu";
 import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -61,7 +60,7 @@ function Home() {
     <Notifications/>
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <Avatar>
+        <Avatar className="ring-1 ring-primary/20">
           <AvatarImage src={user?.image ?? ""} />
           <AvatarFallback>{user?.name.toUpperCase()[0]}</AvatarFallback>
         </Avatar>
