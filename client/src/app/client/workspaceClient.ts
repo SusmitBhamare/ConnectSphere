@@ -2,7 +2,7 @@ import axios from "axios";
 import { toast } from "sonner";
 
 
-const workspaceUrl = "http://localhost:8083"
+const workspaceUrl = process.env.WORKSPACE_URL
 
 
 type WorkspaceData = {

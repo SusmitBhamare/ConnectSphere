@@ -6,7 +6,7 @@ import useUserStore from "../zustand/store";
 import WebSocketService from "../utils/socket";
 
 // Port forwarding Check next.config.js. Done to tackle with cookies not being set in the browser
-const url = 'http://localhost:3000/api/user';
+const url = `${process.env.FRONTEND_URL}/api/user`;
 export async function doesUserExist(username: string) {
   try {
     const response = await axios.get(url + '/util/verify/user/' + username);

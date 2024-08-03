@@ -24,7 +24,7 @@ function Home() {
   const logoutHandler = () => {
     axios
       .post(
-        "http://localhost:3000/api/user/auth/logout",
+        process.env.FRONTEND_URL + "/api/user/auth/logout",
         {},
         {
           headers: {
