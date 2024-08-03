@@ -213,7 +213,7 @@ function WorkspaceModel({
                 <Separator />
                 <div className="mt-4 flex flex-col gap-2">
                   {selectedUsers.map((user) => (
-                    <div className="w-full flex gap-2">
+                    <div key={user.id} className="w-full flex gap-2">
                       <h1 className="text-sm flex-1">{user.username}</h1>
                       <Button
                         type="button"

@@ -98,8 +98,8 @@ const WorkspaceMember = ({
             </div>
           </div>
           {members &&
-            members.map((member) => (
-              <div className="flex gap-2 justify-between items-center">
+            members.map((member)=> (
+              <div key={member.id} className="flex gap-2 justify-between items-center">
                 <div className="flex gap-4 relative items-center">
                   <Avatar className="rounded-full ring ring-primary/50">
                     <AvatarImage
