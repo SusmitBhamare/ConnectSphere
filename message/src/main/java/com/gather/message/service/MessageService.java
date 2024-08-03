@@ -24,4 +24,5 @@ public interface MessageService {
 
   ResponseEntity<List<MessageDTO>> getMissedMessages(UUID userId);
 
+
 }

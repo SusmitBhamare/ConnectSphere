@@ -49,6 +49,7 @@ public class MessageController {
         return ResponseEntity.ok(messageService.getMessagesForConversation(userOneId , userTwoId));
     }
 
+
     @MessageMapping("/users")
     @SendTo("/topic/connectedUsers")
     public Map<String, Set<String>> getConnectedUsers() {
@@ -60,5 +61,6 @@ public class MessageController {
     public ResponseEntity<List<MessageDTO>> notificationMessages(@PathVariable UUID userId) {
         return messageService.getMissedMessages(userId);
     }
+
 
 }

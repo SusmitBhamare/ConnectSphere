@@ -1,6 +1,7 @@
 package com.gather.user.service.impl;
 
 import com.gather.user.client.WorkspaceClient;
+import com.gather.user.dto.ModRequestUserDTO;
 import com.gather.user.dto.UserAllDetailsDTO;
 import com.gather.user.dummy.Workspace;
 import com.gather.user.entity.User;
@@ -160,8 +161,16 @@ public class UserServiceImpl implements UserService {
     if(modRequestRedisService.hasModRequest(userDetails.getUsername())){
       throw new IllegalArgumentException("Mod request already sent");
     }
-    modRequestRedisService.storeModRequest(userDetails.getUsername(), userToUserAllDetailsDTO(user, new HashSet<>() ));
+    ModRequestUserDTO modRequestUserDTO = new ModRequestUserDTO();
+    modRequestUserDTO.setUsername(userDetails.getUsername());
+    modRequestUserDTO.setEmail(user.getEmail());
+    modRequestUserDTO.setName(user.getName());
+    modRequestUserDTO.setWorkspaces(new ArrayList<>(user.getWorkspaces()));
+    modRequestUserDTO.setUsersInteractedWith(new ArrayList<>(user.getUsersInteractedWith()));
+
+    modRequestRedisService.storeModRequest(userDetails.getUsername(), modRequestUserDTO);
     return "Mod request sent";
   }
+
 
 }

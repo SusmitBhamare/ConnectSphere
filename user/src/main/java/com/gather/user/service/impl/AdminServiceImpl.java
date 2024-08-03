@@ -1,12 +1,11 @@
 package com.gather.user.service.impl;
 
-import com.gather.user.dto.UserAllDetailsDTO;
+import com.gather.user.dto.ModRequestUserDTO;
 import com.gather.user.entity.Role;
 import com.gather.user.entity.User;
 import com.gather.user.repository.UserRepository;
 import com.gather.user.service.AdminService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,13 +32,13 @@ public class AdminServiceImpl implements AdminService {
   }
 
   @Override
-  public ResponseEntity<List<UserAllDetailsDTO>> getModRequests() {
-    return ResponseEntity.ok(modRequestRedisService.getAllModRequests());
+  public List<ModRequestUserDTO> getModRequests() {
+    return modRequestRedisService.getAllModRequests();
   }
 
   @Override
   public void acceptModRequest(String username) {
-    UserAllDetailsDTO userDetails = modRequestRedisService.getModRequest(username);
+    ModRequestUserDTO userDetails = modRequestRedisService.getModRequest(username);
     if (userDetails == null) {
       throw new IllegalArgumentException("User's mod request not found");
     }
@@ -56,7 +55,7 @@ public class AdminServiceImpl implements AdminService {
 
   @Override
   public void rejectModRequest(String username) {
-    UserAllDetailsDTO userDetails = modRequestRedisService.getModRequest(username);
+    ModRequestUserDTO userDetails = modRequestRedisService.getModRequest(username);
     if (userDetails == null) {
       throw new IllegalArgumentException("User's mod request not found");
     }

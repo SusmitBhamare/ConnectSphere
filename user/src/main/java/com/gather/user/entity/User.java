@@ -32,16 +32,16 @@ public class User implements UserDetails {
   private String image;
   private Role role;
 
-  @ElementCollection(targetClass = UUID.class)
+  @ElementCollection(targetClass = UUID.class , fetch = FetchType.EAGER)
   private Collection<UUID> messagesSent;
 
-  @ElementCollection(targetClass = UUID.class)
+  @ElementCollection(targetClass = UUID.class , fetch = FetchType.EAGER)
   private Collection<UUID> usersInteractedWith;
 
-  @ElementCollection(targetClass = UUID.class)
+  @ElementCollection(targetClass = UUID.class , fetch = FetchType.EAGER)
   private Collection<UUID> messagesReceived;
 
-  @ElementCollection(targetClass = UUID.class)
+  @ElementCollection(targetClass = UUID.class , fetch = FetchType.EAGER)
   private Collection<UUID> workspaces;
 
   @Override

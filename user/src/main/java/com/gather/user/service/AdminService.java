@@ -1,5 +1,6 @@
 package com.gather.user.service;
 
+import com.gather.user.dto.ModRequestUserDTO;
 import com.gather.user.dto.UserAllDetailsDTO;
 import com.gather.user.entity.User;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +11,7 @@ public interface AdminService {
 
   void createAdmin();
 
-  ResponseEntity<List<UserAllDetailsDTO>> getModRequests();
+  List<ModRequestUserDTO> getModRequests();
 
   void acceptModRequest(String username);
 

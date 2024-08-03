@@ -9,12 +9,11 @@ import org.springframework.stereotype.Repository;
 import com.gather.message.entity.Message;
 
 @Repository
-public interface MessageRepository extends JpaRepository<Message,UUID> {
+public interface MessageRepository extends JpaRepository<Message, UUID> {
 
-    List<Message> findAllByWorkspaceId(UUID workspaceId);
+  List<Message> findAllByWorkspaceId(UUID workspaceId);
 
-    List<Message> findAllBySenderIdAndReceiverIdsContains(UUID senderId, UUID receiverId);
+  List<Message> findAllBySenderIdAndReceiverIdsContains(UUID senderId, UUID receiverId);
 
-  List<Message> findAllByReceiverIdsContains(UUID userId);
-
+  void deleteBySenderIdAndReceiverIdsContains(UUID userOneId, UUID userTwoId);
 }

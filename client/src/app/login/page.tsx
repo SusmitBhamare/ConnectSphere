@@ -23,7 +23,7 @@ import { useRouter } from "next/navigation";
 import useUserStore from "../zustand/store";
 
 const Login = () => {
-  const {token , setOnlineMembers} = useUserStore();
+  const {user , fetchUser} = useUserStore();
   const [quote, setQuote] = useState<{ quote: string; author: string }>({
     quote: "",
     author: "",
@@ -42,6 +42,13 @@ const Login = () => {
       username: "",
       password: "",
     });
+
+    await fetchUser();
+    
+    if(user && user.role === "ADMIN"){
+      router.push("/admin");
+      return;
+    }
     
     router.push("/chat");
   };

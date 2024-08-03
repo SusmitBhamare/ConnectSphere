@@ -1,7 +1,9 @@
 package com.gather.user.config;
 
 
+import com.gather.user.dto.ModRequestUserDTO;
 import com.gather.user.dto.UserAllDetailsDTO;
+import com.gather.user.entity.User;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -16,8 +18,8 @@ public class RedisConfig {
 
 
   @Bean
-  public RedisTemplate<String, UserAllDetailsDTO> redisTemplate(RedisConnectionFactory redisConnectionFactory){
-    RedisTemplate<String,UserAllDetailsDTO> template = new RedisTemplate<>();
+  public RedisTemplate<String, ModRequestUserDTO> redisTemplate(RedisConnectionFactory redisConnectionFactory){
+    RedisTemplate<String, ModRequestUserDTO> template = new RedisTemplate<>();
     template.setConnectionFactory(redisConnectionFactory);
     template.setKeySerializer(new StringRedisSerializer());
     template.setValueSerializer(new GenericJackson2JsonRedisSerializer());

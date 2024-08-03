@@ -11,17 +11,19 @@ import useUserStore from "../zustand/store";
 const AcceptRejectButtons = ({
   user,
   users,
+  setUsers,
 }: {
   user: User;
   users: User[];
+  setUsers: React.Dispatch<React.SetStateAction<User[]>>;
 }) => {
   const { token } = useUserStore();
   const handleAccept = () => {
     acceptModRequest(token, user.username)
       .then((data) => {
         toast.success("Accepted");
-        const newUsers = users.filter((u) => u.username !== user.username);
-        users = newUsers;
+        setUsers(users.filter((u) => u.username !== user.username));
+        
       })
       .catch((e: any) => {
         toast.error(e.message);
@@ -32,8 +34,7 @@ const AcceptRejectButtons = ({
     rejectModRequest(token, user.username)
       .then((data) => {
         toast.success("Rejected");
-        const newUsers = users.filter((u) => u.username !== user.username);
-        users = newUsers;
+        setUsers(users.filter((u) => u.username !== user.username));
       })
       .catch((e: any) => {
         toast.error(e.message);

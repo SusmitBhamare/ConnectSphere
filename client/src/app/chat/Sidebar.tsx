@@ -12,12 +12,6 @@ import { getUser } from "../client/userClient";
 import { debounce } from "lodash";
 import { MessageResponse } from "@/app/types/Message";
 import { getMessagesForUser } from "../client/messageClient";
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu";
 import { cn } from "@/lib/utils";
 
 
@@ -157,9 +151,9 @@ function Sidebar({
         {user?.workspaces &&
           user.workspaces.map((workspace: Workspace) => (
             <WorkspaceChat
-              key={workspace.id}
+              key={workspace?.id}
               workspace={workspace}
-              isActive={isActive === workspace.id}
+              isActive={isActive === workspace?.id}
             />
           ))}
       </div>
@@ -180,7 +174,7 @@ function Sidebar({
     return (
       <div
         onClick={() => {
-          handleSelectChat(workspace.id, workspace);
+          handleSelectChat(workspace?.id, workspace);
         }}
         className={`${
           isActive ? "bg-primary/30" : "bg-zinc-900"
@@ -190,7 +184,7 @@ function Sidebar({
           <AvatarImage
             className="rounded-full w-8"
             src={workspace?.image}
-            alt={workspace.name}
+            alt={workspace?.name}
           />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
@@ -214,8 +208,7 @@ function Sidebar({
     lastMessage?: string;
   }) {
     return (
-      <ContextMenu>
-        <ContextMenuTrigger asChild>
+
           <div
             onClick={() => {
               handleUserChat(user.id, user);
@@ -249,12 +242,7 @@ function Sidebar({
               )}
             </div>
           </div>
-        </ContextMenuTrigger>
-        <ContextMenuContent>
-          <ContextMenuItem>Delete Chat</ContextMenuItem>
-          <ContextMenuItem>Clear Chat</ContextMenuItem>
-        </ContextMenuContent>
-      </ContextMenu>
+
     );
   }
 }
