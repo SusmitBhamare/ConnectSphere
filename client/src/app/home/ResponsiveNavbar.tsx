@@ -28,7 +28,7 @@ function ResponsiveNavbar() {
     const logoutHandler = () => {
       axios
         .post(
-          process.env.FRONTEND_URL + "/api/user/auth/logout",
+          process.env.NEXT_PUBLIC_FRONTEND_URL + "/api/user/auth/logout",
           {},
           {
             headers: {

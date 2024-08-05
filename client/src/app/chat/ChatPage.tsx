@@ -42,7 +42,10 @@ const ChatPage = () => {
     };
 
     handleLocationChange(); // Call initially to handle the current URL
-  }, [searchParams, user]);
+    console.log("ChatPage.tsx: handleLocationChange() called");
+    
+  }, [searchParams]);
+
 
   return (
     <div className="max-w-screen h-[90vh] grid grid-cols-4 mt-16">

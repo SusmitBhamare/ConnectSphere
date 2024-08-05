@@ -2,7 +2,7 @@ import axios from "axios";
 import { toast } from "sonner";
 
 
-const workspaceUrl = process.env.WORKSPACE_URL
+const workspaceUrl = process.env.NEXT_PUBLIC_WORKSPACE_URL
 
 
 type WorkspaceData = {
