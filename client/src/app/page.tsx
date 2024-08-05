@@ -26,7 +26,7 @@ function HomePage() {
             className="flex gap-2 my-2 items-center"
             target="_blank"
           >
-            <FaGithub className="h-5 w-5" />{" "}
+            <FaGithub className="h-5 w-5" />
             <p className="text-base text-muted-foreground">
               Contribute to Gather
             </p>
@@ -45,12 +45,12 @@ function HomePage() {
         <div className="">
           <h1 className="text-lg font-semibold">About the developer</h1>
           <p>
-            Hey, I'm a Graduate Computer Science student from Boston with a
-            passion for full-stack development projects. I'm always open to
+            Hey, I&apos;m a Graduate Computer Science student from Boston with a
+            passion for full-stack development projects. I&apos;m always open to
             collaboration, so feel free to reach out!
           </p>
           <div className="flex text-sm items-center gap-1">
-            View my other projects <MdArrowRight />{" "}
+            View my other projects <MdArrowRight />
             <Link href={"https://mehulparekh.vercel.app"} className="underline">
               Portfolio
             </Link>
@@ -79,7 +79,7 @@ const Hero = () => {
           asChild
         >
           <Link href={"/register"}>
-            Get Started{" "}
+            Get Started
             <MdArrowUpward className="group-hover:rotate-90 transition-all delay-150" />
           </Link>
         </Button>

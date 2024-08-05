@@ -75,6 +75,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public UserAllDetailsDTO getUserByUsername(String username) {
     User user = userRepository.findByUsername(username).orElse(null);
+    if(user == null) return null;
     return userToUserAllDetailsDTO(user, new HashSet<>() );
   }
 

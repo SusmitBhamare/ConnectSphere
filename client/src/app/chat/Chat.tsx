@@ -92,7 +92,7 @@ function Chat({
   useEffect(() => {
     // if (!selectedChat) return; // Exit if no chat is selected
 
-    const socket = new SockJS("http://localhost:8082/ws");
+    const socket = new SockJS(`${process.env.NEXT_PUBLIC_MESSAGE_URL}/ws`);
     const stomp = Stomp.over(() => socket);
 
     stomp.connect(

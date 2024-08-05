@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const messageUrl = "http://localhost:8082"
+const messageUrl = process.env.NEXT_PUBLIC_MESSAGE_URL;
 
 
 export async function getMessagesForWorkspace(workspaceId: string, token: string | undefined | null) {

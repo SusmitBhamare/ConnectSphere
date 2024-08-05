@@ -16,7 +16,6 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
-
 public class RedisConfig {
 
     @Autowired
@@ -24,6 +23,7 @@ public class RedisConfig {
 
     @Bean
     public RedisTemplate<String, MessageDTO> redisTemplate(RedisConnectionFactory redisConnectionFactory){
+
         RedisTemplate<String,MessageDTO> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
@@ -31,23 +31,16 @@ public class RedisConfig {
         return template;
     }
 
-//    @Bean
-//    public RedisTemplate<String,String> redisUserStatusTemplate(RedisConnectionFactory redisConnectionFactory){
-//        RedisTemplate<String,String> template = new RedisTemplate<>();
-//        template.setConnectionFactory(redisConnectionFactory);
-//        template.setKeySerializer(new StringRedisSerializer());
-//        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-//        return template;
-//    }
 
-    @Bean
-    public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory) {
-        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.addMessageListener(new MessageListenerAdapter(messageListener), new PatternTopic("/topic/**"));
-        // Add more listeners as needed for different topics
-        return container;
-    }
+//
+//    @Bean
+//    public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory) {
+//        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+//        container.setConnectionFactory(connectionFactory);
+//        container.addMessageListener(new MessageListenerAdapter(messageListener), new PatternTopic("/topic/**"));
+//        // Add more listeners as needed for different topics
+//        return container;
+//    }
 
 
 }

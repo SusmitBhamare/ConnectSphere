@@ -52,8 +52,8 @@ const Notifications = () => {
   function handleNotificationClick(notification: MessageResponse) {
     setNotifications(notifications.filter((n) => n.id !== notification.id));
     router.push(
-      notification.workspaceId
-        ? "chat?workspace=" + notification.workspaceId.id
+      notification.workspace
+        ? "chat?workspace=" + notification.workspace.id
         : "chat?user=" + notification.sender?.id
     );
   }
@@ -105,8 +105,8 @@ const Notifications = () => {
               >
                 <h1 className="text-primary text-xs">
                   {notification.sender.name} has sent a message
-                  {notification.workspaceId &&
-                    " in " + notification.workspaceId.name}
+                  {notification.workspace &&
+                    " in " + notification.workspace.name}
                 </h1>
                 <p className="text-foreground flex gap-2 items-center text-balance line-clamp-2">
                   {notification.content}
